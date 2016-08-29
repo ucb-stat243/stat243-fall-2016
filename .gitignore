@@ -14,4 +14,4 @@ data/.DS_Store
 
 # files in units/
 units/*.DS_Store
-units/*.pdf
+
