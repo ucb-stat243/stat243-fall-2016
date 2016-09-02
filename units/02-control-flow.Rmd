@@ -30,7 +30,7 @@ knitr::opts_chunk$set(size = 'footnotesize', width = 78)
 - assignment statements
 - arithmetic expressions
 - function calls
-- conditional statemetns
+- conditional statements
 - loop statements
 - etc
 
@@ -942,7 +942,7 @@ while (value < 40) {
 either `repeat` or `while`
 - `while` evaluates the condition at the beginning
 - `repeat` executes operations until a stop condition is met
-- If you know the number to times that something will be done, use `for`
+- If you know the number of times that something will be done, use `for`
 - `for` needs an _iterator_ and a vector of _times_
 
 
