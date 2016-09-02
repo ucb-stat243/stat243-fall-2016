@@ -337,6 +337,22 @@ after another; you need to control the flow of execution
 # If-then-else
 
 __If-then-else__ statements make it possible to choose between two 
+(possibly compound) expressions depending on the value of a logical condition
+
+```{r}
+# absolute value
+num <- rnorm(1)
+if (num >= 0) {
+  num
+} else {
+  -num
+}
+```
+
+
+# If-then-else
+
+__If-then-else__ statements make it possible to choose between two 
 (possibly compound) expressions depending on the value of logical condition
 
 ```{r eval=FALSE}
@@ -372,9 +388,9 @@ if (5 > 2) 5 * 2 else 5 / 2
 
 # simple if-then-else
 if (5 > 2) { 
-  5*2
+  5 * 2
 } else { 
-  5/2
+  5 / 2
 }
 ```
 
@@ -409,7 +425,7 @@ if (condition) {
 ```{r}
 y <- -5
 
-if (y >= 0) {
+if (y > 0) {
   print("it is positive")
 } else {
   print("it is negative")
@@ -434,7 +450,7 @@ if (c(TRUE, TRUE)) {
 
 # Just If
 
-It is also possible to have the if clause (without _else_)
+It is also possible to have the __if__ clause (without _else_)
 ```{r eval = FALSE}
 # just if
 if (condition) { 
@@ -831,13 +847,13 @@ A
 # For Loops and Vectorized Computations
 
 - R `for` loops have bad reputation for being slow
-- Experienced users will tell you to avoid for loops in R (me included)
-- R provides a family of functions that tend to be more efficient than loops
+- Experienced users will tell you "tend to avoid for loops in R" (me included)
+- R provides a family of functions that are usually more efficient than loops
 (i.e. `apply()` functions)
 - You can start solving a problem using `for` loops
 - Once you solved it, try to see if you can find a vectorized alternative
 - It takes practice and experience to find alternative solutions to `for` loops
-- There are cases when using `for` loops is inevitable
+- There are cases when using `for` loops is not that bad
 
 
 # Repeat Loop
