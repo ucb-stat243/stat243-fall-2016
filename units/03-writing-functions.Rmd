@@ -1,0 +1,784 @@
+---
+title: "Stat 243"
+subtitle: "Writing Functions"
+author: "Gaston Sanchez"
+date: "Creative Commons Attribution 4.0 International License"
+output: 
+  beamer_presentation:
+    includes:
+      in_header: header.tex
+---
+
+```{r, setup, include=FALSE}
+library(knitr)
+# smaller font size for chunks
+knitr::opts_chunk$set(size = 'footnotesize', width = 78, error=TRUE)
+#options(width=78)
+```
+
+
+# 
+
+\begin{center}
+\Huge{\hilit{Functions}}
+\end{center}
+
+
+# Motivation
+
+- R comes with many functions (and packages) that let us perform a wide variety of tasks.
+- Most of the things we do in R is via calling some function
+- Sometimes, however, there's no function to do what we want to achieve.
+- Now we want to write functions ourselves
+- Idea: avoid repetitive coding (errors will creep in)
+
+
+# Anatomy of a function
+
+`function()` allows us to create a function. It has the following structure:
+```{r eval = FALSE}
+function_name <- function(arg1, arg2, etc) 
+{
+  expression_1
+  expression_2
+  ...
+  expression_n
+}
+```
+
+
+# Anatomy of a function
+
+- Generally, we will give a name to a function
+- A function takes one or more inputs (or none), known as _arguments_
+- The expressions forming the operations comprise the __body__ of the function
+- Functions with simple expressions don't require braces
+- Functions with compound expressions do require braces
+- Functions return a single value
+
+
+# Function example
+
+A function that squares its argument
+```{r}
+square <- function(x) {
+  x * x
+}
+```
+
+- the function name is `"square"`
+- it has one argument: `x`
+- the function body consists of one simple expression
+- it returns the value `x * x`
+
+
+# Function example
+
+It works like any other function in R:
+```{r}
+square(10)
+```
+
+In this case, `square()` is also vectorized
+```{r}
+square(1:5)
+```
+
+Why is `square()` vectorized?
+
+
+# Function example
+
+Once defined, functions can be used in other functions definitions:
+```{r}
+sum_of_squares <- function(x) {
+  sum(square(x))
+}
+
+sum_of_squares(1:5)
+```
+
+
+# Function example
+
+Functions with a body consisting of a simple expression can be written with
+no braces (in one single line!):
+```{r}
+square <- function(x) x * x
+
+square(10)
+```
+
+However, we recommend you to always write functions using braces
+
+
+# Nested Functions
+
+We can also define a function inside another function:
+
+```{r}
+getmax <- function(a) {
+  # nested function
+  maxpos <- function(u) which.max(u) 
+  # output
+  list(position = maxpos(a),
+       value = max(a))
+}
+
+getmax(c(2, -4, 6, 10, pi))
+```
+
+
+# Naming Functions
+
+## Different ways to name functions
+
+- `squareroot()`
+- `SquareRoot()`
+- `squareRoot()`
+- `square.root()`
+- `square_root()`
+
+
+# Function Names
+
+## Invalid names
+
+- `5quareroot()`: cannot begin with a number
+- `_square()`: cannot begin with an underscore
+- `square-root()`: cannot use hyphenated names
+
+In addition, avoid using an already existing name, e.g. `sqrt()`
+
+
+# 
+
+\begin{center}
+\Huge{\hilit{Function Output}}
+\end{center}
+
+
+# Function Output
+
+- The body of a function is an expression
+- Remember that every expression has a value
+- Hence every function has a value
+
+
+# Function Output
+
+The value of a function can be established in two ways:
+
+- As the last evaluated simple expression (in the body)
+- An explicitly __returned__ value via `return()`
+
+
+# The `return()` command
+
+Sometimes the `return()` command is included to explicitly indicate the output 
+of a function:
+
+```{r}
+add <- function(x, y) {
+  z <- x + y
+  return(z)
+}
+
+add(2, 3)
+```
+
+
+# The `return()` command
+
+If no `return()` is present, then R returns the last evaluated expression:
+
+```{r}
+# output with return()
+add <- function(x, y) {
+  x + y
+}
+
+add(2, 3)
+```
+
+
+# Function Output
+
+Depending on what's returned or what's the last evaluated expression, just 
+calling a function might not print anything:
+
+```{r}
+# nothing is printed
+add <- function(x, y) {
+  z <- x + y
+}
+
+add(2, 3)
+```
+
+
+# Function Output
+
+Here we call the function and assign it to an object. The last evaluated 
+expression has the same value in both cases:
+
+```{r}
+# nothing is printed
+add <- function(x, y) {
+  z <- x + y
+}
+
+a1 <- add(2, 3)
+a1
+```
+
+
+# The return()
+
+`return()` can be useful when the output may be obtained in the middle of the
+function's body
+
+```{r}
+more_less <- function(x, y, add = TRUE) {
+  if (add) {
+    return(x + y) 
+  } else {
+    return(x - y)
+  }
+}
+```
+
+
+# 
+
+\begin{center}
+\Huge{\hilit{Function Writing}}
+\end{center}
+
+
+# General Strategy for Writing Functions
+
+- Always start simple with test toy-values
+- Get what will be the body of the function working first
+- Check out each step of the way
+- Don't try and do too much at once
+- Create (encapsulate body) the function once everything works
+
+
+# Variance Function Example
+
+The sample variance is given by the following formula: 
+$$
+var(x) = \frac{1}{n-1} \sum_{i = 1}^{n} (x_i - \bar{x})
+$$
+
+
+# Variance Function example
+
+```{r}
+# start simple
+x <- 1:10
+
+# get working code
+sum((x - mean(x)) ^ 2) / (length(x) - 1)
+
+# test it: compare it to var()
+var(1:10)
+```
+
+
+# Variance Function example
+
+```{r}
+# encapsulate your code
+variance <- function(x) {
+  sum((x - mean(x)) ^ 2) / (length(x) - 1)
+}
+
+# check that it works
+variance(x)
+```
+
+
+# Variance Function example
+
+```{r}
+# consider less simple cases
+variance(runif(10))
+
+variance(c(1:9, NA))
+
+variance(rep(0, 10))
+```
+
+
+# Variance Function example
+
+```{r}
+# adapt it gradually
+variance <- function(x, na.rm = FALSE) {
+  if (na.rm) {
+    x <- x[!is.na(x)]
+  }
+  sum((x - mean(x)) ^ 2) / (length(x) - 1)
+}
+
+# check that it works
+variance(c(1:9, NA), na.rm = TRUE)
+```
+
+
+# Naming Functions
+
+- Choose meaningful names of functions
+- Prefereably a verb
+- Think about the users (who will use your functions)
+- Think about extreme cases
+
+
+# Names of functions
+
+Avoid this:
+```{r}
+f <- function(x, y) {
+  x + y
+}
+```
+
+This is better
+```{r}
+add <- function(x, y) {
+  x + y
+}
+```
+
+
+# 
+
+\begin{center}
+\Huge{\hilit{Function Arguments}}
+\end{center}
+
+
+# Function Arguments
+
+Functions can have any number of arguments (even zero arguments)
+
+```{r}
+# function with 2 arguments
+add <- function(x, y) x + y 
+
+# function with no arguments
+hi <- function() print("Hi there!")
+hi()
+```
+
+
+# Arguments can have default values
+
+```{r}
+hey <- function(x = "") {
+  cat("Hey", x, "\nHow is it going?")
+}
+
+hey()
+hey("Gaston")
+```
+
+
+# Arguments with no defaults
+
+If you specify an argument with no default value, you must give it a value 
+everytime you call the function, otherwise you'll get an error:
+
+```{r}
+sqr <- function(x) { 
+  x^2
+}
+
+sqr()
+```
+
+
+# Arguments with no default values
+
+Sometimes you don't want to give default values, but you also don't want to 
+cause an error. We can use `missing()` to see if an argument is missing:
+
+```{r}
+abc <- function(a, b, c = 3) {
+  if (missing(b)) {
+    result <- a * 2 + c 
+  } else {
+    result <- a * b + c 
+  }
+  result
+}
+```
+
+
+# Arguments with no default values
+
+You can also set an argument value to NULL if you don't want to specify a
+default value:
+
+```{r}
+abcd <- function(a, b = 2, c = 3, d = NULL) {
+  if (is.null(d)) {
+    result <- a * b + c
+  } else {
+    result <- a * b + c * d
+  }
+  result
+}
+```
+
+
+# More Arguments
+
+```{r eval = FALSE}
+# arguments with and without default values
+myplot <- function(x, y, col = "#3488ff", pch = 19) {
+  plot(x, y, col = col, pch = pch)
+}
+
+myplot(1:5, 1:5)
+```
+
+- `x` and `y` have no default values
+- `col` and `pch` have default values (but they can be changed)
+
+
+# Positional and Named Arguments
+
+```{r}
+omg <- function(pos1, pos2, name1 = 1, name2 = 2) {
+  (pos1 + name1) * (pos2 + name2)
+}
+```
+
+- `pos1` positional argument
+- `pos2` positional argument
+- `name1` named argument
+- `name2` named argument
+
+
+# Arguments
+
+- Arguments with default values are known as __named__ arguments
+- Arguments with no default values are referred to as __positional__ arguments
+
+
+
+# Argument Matching
+
+Arguments can be matched positionally or by name
+
+```{r eval=FALSE}
+values <- seq(-2, 1, length.out = 20)
+
+# equivalent calls
+mean(values)
+mean(x = values)
+mean(x = values, na.rm = FALSE)
+mean(na.rm = FALSE, x = values)
+mean(na.rm = FALSE, values)
+```
+
+
+# Partial Matching
+
+Named arguments can also be partially matched:
+
+```{r results='hide'}
+# equivalent calls
+seq(from = 1, to = 2, length.out = 5)
+seq(from = 1, to = 2, length = 5)
+seq(from = 1, to = 2, len = 5)
+```
+
+`length.out` is partially matched with `length` and `len`
+
+
+# Arguments
+
+```{r results='hide'}
+mean(c(NA, 1:9), na.rm = TRUE)
+
+# saving typing
+mean(c(NA, 1:9), na.rm = T)
+
+# saving typing but dangerous
+mean(c(NA, 1:9), na = T)
+```
+
+
+# Arguments
+
+```{r results='hide'}
+# Generally you don't need to name all arguments
+mean(x = c(NA, 1:9), na.rm = TRUE)
+
+# unusual orders best avoided
+mean(na.rm = TRUE, x = c(NA, 1:9))
+mean(na = T, c(NA, 1:9))
+```
+
+
+# Arguments
+
+```{r results='hide'}
+# Don't need to supply defaults
+mean(x = c(NA, 1:9), na.rm = FALSE)
+
+# Need to remember too much about mean()
+mean(x = c(NA, 1:9), , TRUE)
+
+# Don't abbreviate too much
+mean(c(NA, 1:9), n = T)
+```
+
+
+# Arguments
+
+```{r results='hide'}
+f <- function(a = 1, abcd = 1, abdd = 1) {
+  print(a)
+  print(abcd)
+  print(abdd)
+}
+
+# what will happen?
+f(a = 5)
+f(ab = 5)
+f(abc = 5)
+```
+
+
+# Names of arguments
+
+Give meaningful names to arguments:
+```{r}
+# Avoid this
+area_rect <- function(x, y) {
+  x * y
+}
+```
+
+This is better
+```{r}
+area_rect <- function(length, width) {
+  length * width
+}
+```
+
+
+# Names of arguments
+
+Even better: give default values (whenever possible)
+```{r}
+area_rect <- function(length = 1, width = 1) {
+  length * width
+}
+```
+
+
+# Meaningful names to arguments
+
+Avoid this:
+
+```{r}
+# what does this function do?
+ci <- function(p, r, n, ti) { p * (1 + r/p)^(ti * p)
+}
+```
+
+This is better:
+```{r}
+compound_interest <- 
+function(principal, rate, periods, time) {
+  principal * (1 + rate/periods)^(time * periods)
+}
+```
+
+
+# 
+
+\begin{center}
+\Huge{\hilit{Messages}}
+\end{center}
+
+
+# Messages
+
+There are two main functions for generating warnings and errors:
+
+- `stop()`
+- `warning()`
+- There's also the `stopifnot()` function
+
+
+# Stop Execution
+
+Use `stop()` to stop the execution (this will raise an error)
+
+```{r}
+meansd <- function(x, na.rm = FALSE) {
+  if (!is.numeric(x)) {
+    stop("x is not numeric")
+  }
+  # output
+  c(mean = mean(x, na.rm = na.rm),
+    sd = sd(x, na.rm = na.rm))
+}
+```
+
+
+# Warning Messages
+
+Use `warning()` to show a warning message
+```{r}
+meansd <- function(x, na.rm = FALSE) {
+  if (!is.numeric(x)) {
+    warning("non-numeric input coerced to numeric")
+    x <- as.numeric(x) 
+  }
+  # output
+  c(mean = mean(x, na.rm = na.rm),
+    sd = sd(x, na.rm = na.rm))
+}
+```
+
+A warning is useful when you don't want to stop the execution, but you still 
+want to show potential problems
+
+
+# Function `stopifnot()`
+
+`stopifnot()` ensures the truth of expressions:
+
+```{r}
+meansd <- function(x, na.rm = FALSE) {
+  stopifnot(is.numeric(x))
+  # output
+  c(mean = mean(x, na.rm = na.rm),
+    sd = sd(x, na.rm = na.rm)) 
+}
+
+meansd('hello')
+```
+
+
+# 
+
+\begin{center}
+\Huge{\hilit{Documenting Functions}}
+\end{center}
+
+
+# Documenting Functions
+
+- Description: what the function does
+- Input(s): what are the inputs or arguments
+- Output: what is the output (returned value)
+
+
+# Documenting Functions
+
+Documentation outside the function
+```{r}
+# Description: calculates the area of a rectangle
+# Inputs
+#   length: numeric value
+#   width: numeric value
+# Output
+#   area value
+area_rect <- function(length = 1, width = 1) {
+  length * width
+}
+```
+
+
+# Documenting Functions
+
+Documentation inside the function's body
+```{r}
+area_rect <- function(length = 1, width = 1) {
+  # Description: calculates the area of a rectangle
+  # Inputs
+  #   length: numeric value
+  #   width: numeric value
+  # Output
+  #   area value
+  
+  length * width
+}
+```
+
+
+# Roxygen comments
+
+Documentation with roxygen documents (good for packaging purposes)
+```{r}
+#' @title Area of Rectangle
+#' @description Calculates the area of a rectangle
+#' @param length numeric value
+#' @param width numeric value
+#' @return area (i.e. product of length and width)
+#' @examples
+#'   area_rect()
+#'   area_rect(length = 5, width = 2)
+#'   area_rect(width = 2, length = 5)
+area_rect <- function(length = 1, width = 1) {
+  length * width
+}
+```
+
+
+# Good Principles
+
+- Don't write long functions
+- Rewrite long functions by converting collections of related expressions
+into separate functions
+- A function often corresponds to a verb of a particular step or task in a
+sequence of tasks
+- Functions form the building blocks for larger tasks
+
+
+# Good Principles
+
+- Write functions so that they can be reused in different settings.
+- When writing a function, think about different scenarios and contexts in
+which it might be used
+- Can you generalize it?
+- Avoid hard coding values that the user might want to provide. Make them
+default values of new parameters.
+- Make the actions of the function as few as possible, or allow the user to
+turn off some via logical parameters
+
+
+# Good Principles
+
+- Separate small functions:
+- are easier to reason about and manage
+- clearly identify what they do
+- are easier to test and verify they are correct
+- are more likely to be reusable as they each do less and so you can pick 
+the functions that do specific tasks
+
+
+# Good Principles
+
+- Make functions parameterizable
+- Allow the user to specify values htat might be computed in the function
+- This facilitates testing and avoiding recomputing the same thing in 
+different calls
+- Can specify different value when testing
+- Use a default value to do those computations that would be in the body 
+of the function
+
+
+# Good Principles
+
+- Always test the functions you've written
+- Even better: let somebody else test them for you
