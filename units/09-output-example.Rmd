@@ -76,12 +76,18 @@ Std Dev: 2.79
 
 Here's one way to start:
 ```{r eval = FALSE}
+# summary statistics of unemp
+aus_min <- min(australia$unemp)
+aus_max <- max(australia$unemp)
+aus_med <- median(australia$unemp)
+aus_avg <- mean(australia$unemp)
+aus_sd <- sd(australia$unemp)
+
+# name of output file
 outfile <- "australia-statistics.txt"
-file.create(outfile)
 
 # first line of the file
 cat("Australia Unemployment Statistics\n\n", file = outfile)
-
 # subsequent lines appended to the output file
 cat("Minimum:", aus_min, "\n", file = outfile, append = TRUE)
 cat("Maximum:", aus_max, "\n", file = outfile, append = TRUE)
