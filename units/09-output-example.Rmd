@@ -106,13 +106,14 @@ cat(sprintf('Std Dev: %0.2f', aus_sd), "\n", file = outfile, append = TRUE)
 ```
 
 __Your turn:__
-How would you avoid writing almost identical calls to `cat()`?
+How would you avoid writing that many calls to `cat()`?
 
 
 ## Sending R output to a file with `sink()`
 
 Another interesting function is `sink()`. This function is very useful when
-you want to export R output. For example, consider the output from `summary()`
+you want to export R output as is displayed in the R console. For example, 
+consider the output from `summary()`
 ```{r eval=FALSE}
 summary(australia)
 ```
@@ -142,6 +143,24 @@ Use `sink()` to send the output from running a linear regression of `unemp` on
 `realgdpgr` with the function `lm()`. Also export the results from
 using `summary()` on the regression object. And/or try running a t-test
 between `unemp` and `realgdpgr` with `t.test()`.
+
+
+## Exporting tables with `xtable()`
+
+Another interesting tool to export tables in LaTeX or HTML formats is provided
+by the R package `"xtable"` and its main function `xtable()`.
+
+```{r eval = FALSE}
+library(xtable)
+
+# linear regression
+reg <- lm(realgdpgr ~ unemp, data = dat)
+
+# create xtable and export it
+reg_table <- xtable(reg)
+print(reg_table, type = "latex", file = "reg-table.tex")
+print(reg_table, type = "html", file = "reg-table.html")
+```
 
 
 ## R's Binary Data
