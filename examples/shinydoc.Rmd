@@ -1,0 +1,45 @@
+---
+runtime: shiny
+output: html_document
+---
+
+```{r echo=FALSE}
+library(babynames)
+library(ggplot2)
+```
+
+## Shiny Document
+
+Please select a name to explore.
+
+```{r echo=FALSE}
+textInput(inputId = "name", label = "Name:", value = "Gaston")
+names <- reactive(subset(babynames, name == input$name))
+```
+
+
+Here is a graph of the number of people named `r renderText(input$name)`.
+
+```{r echo=FALSE, fig.height=3, fig.width=5}
+renderPlot(
+  ggplot(data = names(), aes(x = year, y = n)) +
+    geom_line(aes(color = sex), size = 1.5) + 
+    theme_bw()
+)
+```
+
+`r renderText(input$name)` was more popular than ever in 
+`r renderText(names()$year[which.max(names()$n)])`. 
+That year there were `r renderText(names()$n[which.max(names()$n)])` babies named `r renderText(input$name)`.
+So far, `r renderText(sum(names()$n))` people have been named `r renderText(input$name)`. 
+
+`r hr()`
+
+Here's an example of `renderPrint()`
+`r renderPrint(paste('Selected name is:', input$name))`
+
+`r hr()`
+
+Here's an example of `renderTable()` showing the last rows in the subset dataframe `babynames`:
+`r renderTable(tail(names()))`
+
