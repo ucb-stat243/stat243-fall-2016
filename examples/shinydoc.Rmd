@@ -6,6 +6,7 @@ output: html_document
 ```{r echo=FALSE}
 library(babynames)
 library(ggplot2)
+library(stringr)
 ```
 
 ## Shiny Document
@@ -15,6 +16,9 @@ Please select a name to explore.
 ```{r echo=FALSE}
 textInput(inputId = "name", label = "Name:", value = "Gaston")
 names <- reactive(subset(babynames, name == input$name))
+
+# another option
+#names <- reactive(subset(babynames, name == str_to_title(input$name)))
 ```
 
 
