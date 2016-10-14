@@ -31,7 +31,7 @@ setClass(
 The argument `Class` is used to specify the name of the class. The argument
 `representation` allows you specify the attributes of the objects. Compared
 to S3 classes, S4 classes allows you to be more explicit about the exact
-type of objects fot the attributes. In the `coin` example, the `sides` of
+type of objects for the attributes. In the `coin` example, the `sides` of
 the coin are set to a character vector; likewise the `prob` (probabilities)
 of each side are set to a numeric vector.
 
@@ -43,7 +43,15 @@ coin1 <- new(Class = "coin",
 coin1
 ```
 
-Another coin:
+If you try to create a new `coin` with the wrong type of `sides` and `prob`,
+you will get an error message like this:
+```{r}
+coin2 <- new(Class = "coin", 
+             sides = c(0, 1), 
+             prob = c(TRUE, FALSE))
+```
+
+Let's create another coin:
 ```{r}
 quarter1 <- new(Class = "coin", 
                 sides = c("washington", "fort"), 
@@ -60,7 +68,7 @@ coin1@prob
 
 ### Prototype
 
-When defining a class, often it's good to include a `prototype`, that is, a
+When defining a class, often it's useful to include a `prototype`, that is, a
 _default_ instance for an object:
 ```{r}
 # class "coin"
@@ -77,7 +85,7 @@ setClass(
 )
 ```
 Notice that, by default, creating a new `"coin"` will have `sides` attributes
-heads and tails, and probabilities `prob` 0.5 (i.e. a fair coin).
+`"heads"` and `"tails"`, and probabilities `prob` 0.5 and 0.5 (i.e. a fair coin).
 
 Let's re-initialize `coin1` with the default `prototype`:
 ```{r}
@@ -92,6 +100,9 @@ slotNames("coin")
 getSlots("coin")
 ```
 
+
+### Print method
+
 Like the `print` method with S3 classes, you can define a `print` method for
 S4 classes. To do so, use the function `setMethod()`. When declaring a specific 
 `"print"` method you use the argument `signature = "coin"` to indicate that
@@ -101,11 +112,9 @@ setMethod(
   "print",
   signature = "coin", 
   function(x, ...) {
-    cat('object "coin"\n')
-    cat("sides: ")
-    print(x@sides)
-    cat("prob: ")
-    print(x@prob)
+    cat('object "coin"\n\n')
+    cat("sides: ", x@sides, "\n")
+    cat("prob : ", x@prob)
   }
 )
 ```
@@ -116,15 +125,47 @@ is applied to `"coin"`:
 print(coin1)
 ```
 
+Note that the `print` method only works when you explicitly call `print()`.
+If you just simplyt type the name of the object, the displayed values are
+different:
+```{r}
+coin1
+```
+
+
+
+### Show method
+
+With S4 class objects, in addition to `print` methods, it is also common to
+define a `show` method:
+```{r}
+setMethod("show", 
+          signature(object = "coin"),
+          function(object) {
+            cat("sides:", "\n")
+            print(object@sides)
+            cat("\nprob:", "\n")
+            print(object@prob)
+          })
+```
+
+The `show` method is the actual function that is called everytime you type the
+name of the object:
+```{r}
+coin1
+```
+
+
 To see the defined methods on a given class, use `showMethods()`:
 ```{r}
 showMethods(class = "coin")
 ```
 
 
-## Constructor functions
+## Validiting Attributes
 
-The way we have defined the class `"coin"` is not entirely correct.
+The way we have set-up the class `"coin"` is still loosely defined. You could
+create a coin with more than two `sides` and `prob` with incorrect probabilities: 
 ```{r}
 # weird coin
 weird <- new("coin", 
@@ -136,7 +177,7 @@ Even though we are requiring `sides` to be `character`, and `prob` to be
 `numeric`, we didn't specified anything else about the length, or their 
 possible content.
 
-To have a better mechanism, S4 provides a `validity` argument:
+To have a better ensuring mechanism, S4 provides a `validity` argument:
 ```{r}
 # class "coin"
 setClass(
@@ -167,6 +208,47 @@ weird <- new("coin",
              prob = c(1))
 ```
 
+To be have a more complete validity function, you can create an external 
+auxiliary function, e.g. `validate_prob()`, that checks both `sides` and `prob` 
+of a potential `"coin`" object:
+```{r}
+validate_prob <- function(object) {
+  if (length(object@sides) != 2) {
+    stop("'sides' must be of length 2")
+  }
+  if (length(object@prob) != 2 | !is.numeric(object@prob)) {
+    stop("\n'prob' must be a numeric vector of length 2")
+  }
+  if (any(object@prob < 0) | any(object@prob > 1)) {
+    stop("\n'prob' values must be between 0 and 1")
+  }
+  if (sum(object@prob) != 1) {
+    stop("\nelements in 'prob' must add up to 1")
+  }
+  TRUE
+}
+```
+
+And then, include `validate_prob()` as the value of the `validity` argument,
+inside the `setClass()`:
+```{r}
+# class "coin"
+setClass(
+  Class = "coin",
+  representation = representation(
+    sides = "character",
+    prob = "numeric"
+  ),
+  validity = validate_prob,
+  prototype = prototype(
+    sides = c('heads', 'tails'),
+    prob = c(0.5, 0.5)
+  )
+)
+```
+
+
+## Public Constructor Function
 
 Initializing an object with `new()` is not very user friendly. Instead, you
 typically create a user-intended __public constructor__ function:
@@ -181,10 +263,13 @@ coin <- function(sides, prob) {
 Using the public constructor function is like 
 ```{r}
 loaded <- coin(sides = c('h', 't'), prob = c(0.3, 0.7))
+
+loaded
 ```
 
 
-## Generic Methods
+
+## New Generic Methods
 
 In addition to existing methods in R, you can also declare a new generic method.
 Use `setGeneric()`:
@@ -202,6 +287,9 @@ setMethod(
   "flip", 
   signature = "coin",
   function(object, times = 1) {
+    if (!is.numeric(times) | times <= 0) {
+      stop("\n'times' must be a positive integer")
+    }
     sample(object@sides, size = times, replace = TRUE, prob = object@prob)
   }
 )
@@ -216,7 +304,7 @@ flip(coin1, times = 5)
 ## A `"toss"` object
 
 Like we did with S3 classes, we are going to create a `"toss"` object using
-S4 classes. This object will have four attributes:
+S4 classes. This object will have the following attributes:
 
 - the vector of tosses
 - the `sides` of the coin
@@ -236,35 +324,76 @@ setClass(
     total = "integer",
     heads = "integer",
     tails = "integer"
-  ),
-  validity = function(object) {
-    if (length(object@sides) != 2) {
-      stop("'sides' must be of length 2")
-    }
-    if (length(object@prob) != 2) {
-      stop("'prob' must be of length 2")
-    }
-  },
-  prototype = prototype(
-    sides = c('heads', 'tails'),
-    prob = c(0.5, 0.5)
   )
 )
 ```
 
 
-We want a constructor function `toss()`:
+Instead of using `new()` we are going to create a public constructor function 
+`toss()`:
 ```{r}
 toss <- function(coin, times) {
-  tosses = flip(coin, times = times)
-  new(Class = "tosses",
+  tosses <- flip(coin, times = times)
+  new(Class = "toss",
       tosses = tosses,
-      coin@sides = sides,
-      coin@prob = prob,
+      sides = coin@sides,
+      prob = coin@prob,
       total = length(tosses),
-      heads = sum(tosses == "heads"),
-      tails = sum(tosses == "tails"))
+      heads = sum(tosses == coin@sides[1]),
+      tails = sum(tosses == coin@sides[2]))
 }
 ```
 
+Tossing a coin 10 times:
+```{r}
+toss(coin1, 10)
+```
 
+
+## Plot Method
+
+Auxiliary functions:
+```{r}
+head_freqs <- function(x) {
+  cumsum(x$tosses == x$coin[1]) / 1:x$total
+}
+
+
+tail_freqs <- function(x) {
+  cumsum(x$tosses == x$coin[2]) / 1:x$total
+}
+
+
+frequencies <- function(x, side = 1) {
+  if (side == 1) {
+    return(head_freqs(x))
+  } else {
+    return(tail_freqs(x))
+  }
+}
+```
+
+Finally, let's implement the `plot` method for objects `"toss"`
+```{r}
+setMethod(
+  "plot", 
+  signature = "toss",
+  function(x, ...) {
+    freqs <- cumsum(x@tosses == x@sides[1]) / 1:x@total
+    plot(1:x@total, freqs, type = "n", ylim = c(0, 1), las = 1,
+       xlab = "number of tosses", bty = "n",
+       ylab = sprintf("relative frequency of %s", x@sides[1]), ...)
+    abline(h = 0.5, col = "gray70", lwd = 1.5)
+    lines(1:x@total, freqs, col = "tomato", lwd = 2)
+    title(sprintf("Relative Frequencies in a series of %s coin tosses", 
+                  x@total))
+  }
+)
+```
+
+Let's test our `plot` method:
+```{r}
+set.seed(78943)
+toss1 <- toss(coin1, 1000)
+plot(toss1)
+```
