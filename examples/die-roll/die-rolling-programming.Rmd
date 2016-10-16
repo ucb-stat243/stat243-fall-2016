@@ -7,8 +7,9 @@ urlcolor: blue
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, error = TRUE)
 library(xtable)
+source("die-roll-s3class.R")
 ```
 
 
@@ -40,7 +41,7 @@ For the `"die"` object write:
 - a `"print"` method that displays the sides and the associated probabilities
 
 You should be able to use `die()` like this:
-```{r eval = FALSE}
+```{r eval = TRUE}
 # create a fair die by default
 fair_die <- die()
 
@@ -59,28 +60,38 @@ The object `"roll"` should have these attributes:
 
 For the `"roll"` object write:
 
-- a constructor function that _rolls_ a `"die"` a given number of `times`
+- a constructor function `roll()` that _rolls_ a `"die"` a given number of `times`
     + give `times` a default value of 1
-- a `print()` method that displays the sides and the associated probabilities
-- a `summary()` method that displays the frequencies (i.e. counts) and the
-relative frequencies (i.e. percentage) of each side of the rolled `die` 
-- a `plot()` method using a barchart of frequencies (count of `1`'s, `2`'s, 
-`3`'s, `4`'s, `5`'s, and `6`'s) 
+- a `print()` method that displays just the rolls
+- a `summary()` method that displays a table of frequencies: both the counts 
+and proportions of each side of the rolled `die` 
+- a `plot()` method using a barchart of frequencies (relative frequencies of
+`1`'s, `2`'s, `3`'s, `4`'s, `5`'s, and `6`'s) 
+- an extraction method `"["` to extract the value of a given roll
+- a replacement method `"[<-"` to replace the value of a given roll
 - an addition `"+"` method to add more rolls
 
 
-```{r eval = FALSE}
+You should be able to use `roll()` and its methods like this:
+
+```{r eval = TRUE}
 # roll fair die
 fair500 <- roll(fair_die, times = 500)
 
 # summary method
 summary(fair500)
 
-# plot method
-plot(fair, 500)
+# retrieving roll in position 100
+fair500[100]
+
+# replacing last roll
+fair500[500] <- 1
 
 # adding 100 rolls
 fair600 <- fair500 + 100
+
+# plot method
+plot(fair500, 500)
 ```
 
 
@@ -115,3 +126,42 @@ count the number of games in which there is at least one 6.
 and then count the number of games in which there is at least one double 6.
 
 
+## Testing whether a die is fair
+
+Here's one more challenge. The idea is to write R code, preferably a function,
+such that given a vector of outputs from rolling a die, it can be determined
+whether the die is fair.
+
+One way to approach this problem is by using Pearson's Chi-square statistic:
+
+$$
+\chi^2 = \sum_{i=1}^{n} \frac{(O_i - E_i)^2}{E_i} = N \sum_{i=1}^{n} \frac{(O_i/ N - p_i)^2}{p_i}
+$$
+
+where:
+
+- $n$ is the number of sides (i.e. 6)
+- $O_i$ is the observed frequency of side $i$, $i = 1, 2, 3, 4, 5, 6$
+- $E_i = N p_i$ is the expected frequency of side $i$
+- $p_i$ is the theoretical relative frequency ($1/6$ assuming a fair roll)
+- $N$ is the total number of rolls
+
+When testing for a fair six-sided die, the statistic $\chi^2$ asymptotically 
+approaches a chi-square distirbution with degrees of freedom $n - 1 = 5$.
+
+You can generate a loaded die, and roll it 1000 times:
+```{r}
+set.seed(3625)
+loaded_die <- die(prob = c(0.075, 0.1, 0.125, 0.15, 0.20, 0.35))
+load_rolls <- roll(loaded_die, 1000)
+```
+
+Try implementing the chi-square statistic and compute a hypothesis test
+to see whether the rolls in `load_rolls` support the null hypothesis of a fair
+die.
+
+
+```{r eval = FALSE, echo = FALSE}
+pchisq(330.728, df = 5, lower.tail = FALSE)
+pchisq(7.192, df = 5, lower.tail = FALSE)
+```
