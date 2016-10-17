@@ -1,0 +1,68 @@
+---
+title: "Getting Started with cointoss"
+author: "Gaston Sanchez"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with cointoss}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(collapse = T, comment = "#>")
+library(cointoss)
+```
+
+## Coin Tossing
+
+The package `"cointoss"` is a minimal implementation for simulating tossing
+a coin a given number of times, and to visualize the relative frequencies
+in such a series of tosses.
+
+
+## Creating a `coin`
+
+The first step is to create a `"coin"` object with the function `coin()`:
+
+```{r}
+mycoin <- coin()
+mycoin
+```
+
+By default, `coin()` creates a _fair_ coin with standard sides `heads`, and 
+`tails`, and with probability values for each side of 0.5.
+
+You can change the defatuls with arguments `sides` and `prob`:
+
+```{r}
+loaded <- coin(c('HEADS', 'tails'), c(0.8, 0.2))
+loaded
+```
+
+
+## Tossing a coin
+
+Once you have defined a `"coin"` object, you can use the function `toss()` to
+_toss_ a coin a given number of `times`. The output will be an object of class 
+`"toss"`, which will contain the vector of `tosses`:
+
+```{r}
+toss500 <- toss(mycoin, times = 100)
+toss500
+```
+
+The `summary()` function gives you a nice table of frequencies:
+```{r}
+summary(toss500)
+```
+
+
+## Plot of relative frequencies
+
+You can use the function `plot()` to create a graohic with the relative 
+frequencies of a series of coin tosses:
+
+```{r, fig.show='hold'}
+plot(toss500)
+```
