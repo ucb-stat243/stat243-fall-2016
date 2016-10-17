@@ -1,2 +1,4 @@
 README.md
 devtools-cointoss.R
+^.*\.Rproj$
+^\.Rproj\.user$
