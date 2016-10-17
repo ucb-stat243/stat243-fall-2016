@@ -1,4 +1,6 @@
-
+# ==============================================================
+# Object Die
+# ==============================================================
 
 # auxiliar function to check the sides of a die
 check_sides <- function(sides) {
@@ -24,7 +26,11 @@ check_prob <- function(prob) {
 }
 
 
-# class "die"
+#' @title Die object
+#' @description constructor function of objects of class "die"
+#' @param sides vector of die sides
+#' @param prob vector with probabilities of sides
+#' @return an object of class "die"
 die <- function(sides = 1:6, prob = rep(1/6, 6)) {
   check_sides(sides)
   check_prob(prob)
@@ -36,6 +42,19 @@ die <- function(sides = 1:6, prob = rep(1/6, 6)) {
   object
 }
 
+
+# print method for object of class "die"
+print.die <- function(x, ...) {
+  cat('object "die"\n\n')
+  df_die <- data.frame(side = x$sides, prob = x$prob)
+  print(df_die)
+  invisible(x)
+}
+
+
+# ==============================================================
+# Object Roll
+# ==============================================================
 
 # auxiliar function to check 'times'
 check_times <- function(times) {
@@ -52,7 +71,7 @@ roll_die <- function(x, times = 1) {
 }
 
 
-# constructor function for object "roll"
+# internal constructor function for object "roll"
 make_roll <- function(die, rolls) {
   object <- list(
     rolls = rolls,
@@ -64,7 +83,11 @@ make_roll <- function(die, rolls) {
 }
 
 
-# main roll function
+#' @title Roll object
+#' @description main roll function
+#' @param die object of class "die"
+#' @param times number of times to roll the die
+#' @return an object of class "roll"
 roll <- function(die, times = 1) {
   rolls <- roll_die(die, times = times)
   make_roll(die, rolls)
@@ -150,6 +173,10 @@ is.roll <- function(x) {
   inherits(x, "roll")
 }
 
+
+# ==============================================================
+# Chi-square Statistic
+# ==============================================================
 
 # chi square statistic for an object "roll"
 chi_square <- function(x) {

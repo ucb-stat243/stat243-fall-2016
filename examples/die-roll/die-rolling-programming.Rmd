@@ -26,8 +26,9 @@ of a `"die"` multiples times).
 - If you are already familiar with S3 classes, try using S4 classes
 - If you are new to both S3 and S4 classes, choose one of them
 
+-----
 
-## Object `"die"`
+# Object `"die"`
 
 The object `"die"` should have two attributes: 
 
@@ -44,13 +45,19 @@ You should be able to use `die()` like this:
 ```{r eval = TRUE}
 # create a fair die by default
 fair_die <- die()
-
-# create a loaded die
-loaded_die <- die(prob = c(0.075, 0.1, 0.125, 0.15, 0.20, 0.35))
+fair_die
 ```
 
 
-## Object `"roll"`
+```{r}
+# create a loaded die
+loaded_die <- die(prob = c(0.075, 0.1, 0.125, 0.15, 0.20, 0.35))
+loaded_die
+```
+
+-----
+
+# Object `"roll"`
 
 The object `"roll"` should have these attributes: 
 
@@ -162,6 +169,8 @@ die.
 
 
 ```{r eval = FALSE, echo = FALSE}
+chi_square(load_rolls)
+
 pchisq(330.728, df = 5, lower.tail = FALSE)
 pchisq(7.192, df = 5, lower.tail = FALSE)
 ```
