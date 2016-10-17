@@ -11,7 +11,8 @@ labs/*.html
 
 # files in data/
 data/.DS_Store
+data/.Rhistory
 
 # files in units/
 units/*.DS_Store
-
+units/.Rhistory
