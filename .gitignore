@@ -18,5 +18,5 @@ units/*.DS_Store
 units/.Rhistory
 
 # files in examples/
-.Rhistory
-cointoss/.Rproj.user
+examples/.Rhistory
+examples/cointoss/.Rproj.user
