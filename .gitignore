@@ -16,3 +16,6 @@ data/.Rhistory
 # files in units/
 units/*.DS_Store
 units/.Rhistory
+
+# files in examples/
+.Rhistory
