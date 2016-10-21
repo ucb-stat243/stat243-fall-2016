@@ -127,22 +127,207 @@ devtools::build()
 devtools::install()
 ```
 
+-----
 
-## More elements: tests and vignettes
+## Including tests for your functions
 
-You should also include test and vignettes.
+There are various packages in R that allow you to include unit tests. One of 
+them is the package `"testthat"`. 
 
-To include unit tests:
+### R package `"testthat"`
+
+`"testthat"` is one of the packages in R that helps you write tests for your functions. One of the main references is the paper 
+_testthat: Get Started with Testing_ by Hadley Wickham (see link below). 
+This paper clearly describes the philisoply and workflow of `"testthat"`. But
+keep in mind that since the introduction of the package, many more functions 
+haven been added to it, and some have been deprecated.
+
+[https://journal.r-project.org/archive/2011-1/RJournal_2011-1_Wickham.pdf](https://journal.r-project.org/archive/2011-1/RJournal_2011-1_Wickham.pdf)
+
+More technical information on tests for a package is here:
 
 [http://r-pkgs.had.co.nz/tests.html](http://r-pkgs.had.co.nz/tests.html)
 
-To include vignettes:
+
+## About `"testthat"`
+
+- `"testthat"` provides a testing framework for R that is easy to learn and use
+- `"testthat"` has a hierarchical structure made up of:
+    + expectations
+    + tests
+    + contexts
+- A __context__ involves __tests__ formed by groups of __expectations__
+- Each structure has associated functions:
+    + `expect_that()` for expectations  (see table below)
+    + `test_that()` for groups of tests
+    + `context()` for contexts
+
+
+### List of common expectation functions
+
+| Function                  | Description                             |
+|---------------------------|-----------------------------------------|
+| `expect_true(x)`          | expects that `x` is `TRUE`              |
+| `expect_false(x)`         | expects that `x` is `FALSE`             |
+| `expect_null(x)`          | expects that `x` is `NULL`              |
+| `expect_type(x)`          | expects that `x` is of type `y`         |
+| `expect_is(x, y)`         | expects that `x` is of class `y`        |
+| `expect_length(x, y)`     | expects that `x` is of length `y`       |
+| `expect_equal(x, y)`      | expects that `x` is equal to `y`        |
+| `expect_equivalent(x, y)` | expects that `x` is equivalent to `y`   |
+| `expect_identical(x, y)`  | expects that `x` is identical to `y`    |
+| `expect_lt(x, y)`         | expects that `x` is less than `y`       |
+| `expect_gt(x, y)`         | expects that `x` is greater than `y`    |
+| `expect_lte(x, y)`        | expects that `x` is less than or equal to `y` |
+| `expect_gte(x, y)`        | expects that `x` is greater than or equal `y` |
+| `expect_named(x)`         | expects that `x` has names `y`          |
+| `expect_matches(x, y)`    | expects that `x` matches `y` (regex)    |
+| `expect_message(x, y)`    | expects that `x` gives message `y`      |
+| `expect_warning(x, y)`    | expects that `x` gives warning `y`      |
+| `expect_error(x, y)`      | expects that `x` throws error `y`       |
+
+-----
+
+## Tests for an R package
+
+- In the directory of the package, create a folder `"tests"`
+- Inside the folder `tests/` create another folder `"testthat"`; this is where 
+you include R scripts containing the unit tests.
+- All the script files inside `testthat/` should start with tha name __test__
+e.g. `test-coin.R`, `test-flip.R`, `test-toss.R`, etc.
+- Inside the folder `testthat/`, create an R script `test-check-coin.R`
+
+
+## Your Turn
+
+Let's modify the code of `coin()`, in the file `coin.R`, by including a 
+couple of auxiliary checking functions: `check_sides()` and `check_prob()`:
+
+```{r eval = FALSE}
+coin <- function(sides = c("heads", "tails"), prob = c(0.5, 0.5)) {
+  check_sides(sides)
+  check_prob(prob)
+
+  object <- list(
+    sides = sides,
+    prob = prob)
+  class(object) <- "coin"
+  object
+}
+
+
+# private function to check vector of sides
+check_sides <- function(sides) {
+  if (length(sides) != 2) {
+    stop("\n'prob' must be a vector of length 2")
+  } 
+  if (!is.numeric(sides) & !is.character(sides)) {
+    stop("\n'sides' must be a character or numeric vector")
+  }
+  TRUE
+}
+
+
+# private funciton to check vector of probabilities
+check_prob <- function(prob) {
+  if (length(prob) != 2 | !is.numeric(prob)) {
+    stop("\n'prob' must be a numeric vector of length 2")
+  }
+  if (any(is.na(prob))) {
+    stop("\n'prob' cannot contain missing values")
+  }
+  if (any(prob < 0) | any(prob > 1)) {
+    stop("\n'prob' values must be between 0 and 1")
+  }
+  if (sum(prob) != 1) {
+    stop("\nelements in 'prob' must add up to 1")
+  }
+  TRUE
+}
+```
+
+
+### Tests
+
+The idea is to write tests for `check_sides()`, `check_prob()`, and `coin()`.
+
+- Go to the `tests/testthat/` folder and open the `test-check-coin.R` file
+- use `context()` to describe what the test are about
+- to run the tests from the R console, use the function `test_file()`
+- Give a `context()` to to describe what the test are about. 
+- You typically group various related tests in one context; 
+e.g. a context for _coin arguments_
+- In a given context, you form groups of expectations inside calls to 
+`test_that()`
+- For example, you can expect that `check_sides()` returns `TRUE` if the 
+value of `sides` is of length 2.
+- Likewise, you can expect an error from `check_sides()` if the values of
+`sides` is of length different than 2:
+
+```{r eval = FALSE}
+context("Coin arguments")
+
+test_that("check_sides with ok vectors", {
+  
+  expect_true(check_sides(c('heads', 'tails')))
+})
+
+
+test_that("check_sides fails with invalid lengths", {
+  
+  expect_error(check_sides(c('one', 'two', 'three')))
+  expect_error(check_sides(c('one')))
+})
+```
+
+To run the tests, you use the `"devtools"` function `test()`. This means that
+your typical packaging workflow will look like this:
+
+```{r eval = FALSE}
+library(devtools)
+
+# creating documentation (i.e. the Rd files in man/)
+devtools::document()
+
+# checking documentation
+devtools::check_man()
+
+# running tests
+devtools::test()
+
+# building tarball (e.g. oski_0.1.tar.gz)
+devtools::build()
+
+# checking install
+devtools::install()
+```
+
+
+-----
+
+## Vignettes
+
+Another element to consider adding to a package is a vignette. A vignette is
+supporting material---usually in the form of a tutorial---that describes how
+to use the main functions of the package.
 
 [http://r-pkgs.had.co.nz/vignettes.html](http://r-pkgs.had.co.nz/vignettes.html)
 
+To create your first vignette with `"devtools"`, run:
 
+```{r eval = FALSE}
+devtools::use_vignette("my-vignette")
+```
 
-## Devtools workflow
+This will:
+
+1. Create a `vignettes/` directory.
+2. Add the necessary dependencies to `DESCRIPTION` (i.e. it adds `knitr` to the 
+`Suggests` and `VignetteBuilder` fields).
+3. Make a draft vignette, `vignettes/my-vignette.Rmd`.
+
+Once you have this file, you need to modify the vignette. After editing the
+vignette, your expanded workflow will be like this:
 
 ```{r eval = FALSE}
 library(devtools)
