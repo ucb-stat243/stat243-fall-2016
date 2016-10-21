@@ -31,6 +31,14 @@ check_prob <- function(prob) {
 #' @param sides vector of die sides
 #' @param prob vector with probabilities of sides
 #' @return an object of class "die"
+#' @export
+#' @examples 
+#' # creating a fair die (by default)
+#' die1 <- die()
+#' 
+#' # a loaded die
+#' loaded1 <- die(1:6, prob = c(0.075, 0.1, 0.125, 0.15, 0.20, 0.35))
+#' 
 die <- function(sides = 1:6, prob = rep(1/6, 6)) {
   check_sides(sides)
   check_prob(prob)
@@ -43,12 +51,22 @@ die <- function(sides = 1:6, prob = rep(1/6, 6)) {
 }
 
 
-# print method for object of class "die"
+#' @export
 print.die <- function(x, ...) {
+  # print method for object of class "die"
   cat('object "die"\n\n')
   df_die <- data.frame(side = x$sides, prob = x$prob)
   print(df_die)
   invisible(x)
+}
+
+
+#' @rdname die
+#' @param x an R object
+#' @export
+is.die <- function(x) {
+  # check class "die"
+  inherits(x, "die")
 }
 
 
@@ -88,23 +106,38 @@ make_roll <- function(die, rolls) {
 #' @param die object of class "die"
 #' @param times number of times to roll the die
 #' @return an object of class "roll"
+#' @export
+#' @examples 
+#' # fair die
+#' die1 <- die()
+#' 
+#' # roll a coin 5 times
+#' roll5 <- roll(die1, times = 5)
 roll <- function(die, times = 1) {
   rolls <- roll_die(die, times = times)
   make_roll(die, rolls)
 }
 
 
-# print method for object of class "roll"
+#' @export
 print.roll <- function(x, ...) {
+  # print method for object of class "roll"
   cat('object "roll"\n\n')
   cat('$rolls\n')
   print(x$rolls)
   invisible(x)
 }
 
-
-# summary method for object of class "roll"
+#' @rdname roll
+#' @param x an object \code{"roll"}
+#' @param \dots further arguments ignored
+#' @export
+#' @examples
+#' roll100 <- roll(die(), times = 100)
+#' summary(roll100)
+#' 
 summary.roll <- function(x, ...) {
+  # summary method for object of class "roll"
   freqs <- table(x$rolls)
   relative_freqs <- prop.table(freqs)
   # table of frequencies
@@ -118,17 +151,18 @@ summary.roll <- function(x, ...) {
 }
 
 
-# print summary method for object of class "roll"
+#' @export
 print.summary.roll <- function(x, ...) {
+  # print summary method for object of class "roll"
   cat('summary "roll"\n\n')
   print(x$freqs)
   invisible(x)
 }
 
 
-
-# plot method for objects of class "roll"
+#' @export
 plot.roll <- function(x, ...) {
+  # plot method for objects of class "roll"
   freqs <- prop.table(table(x$rolls))
   barplot(freqs, border = NA, las = 1,
           xlab = "sides of die",
@@ -137,8 +171,9 @@ plot.roll <- function(x, ...) {
 }
 
 
-# replacement method for "roll"
+#' @export
 "[<-.roll" <- function(x, i, value) {
+  # replacement method for "roll"
   if (all(x$sides != value)) {
     stop(paste('\nreplacing value must be one of', x$sides))
   }
@@ -150,14 +185,16 @@ plot.roll <- function(x, ...) {
 }
 
 
-# extraction method for objects of class "roll"
+#' @export
 "[.roll" <- function(x, i) {
+  # extraction method for objects of class "roll"
   x$rolls[i]
 }
 
 
-# addition method for class "roll"
+#' @export
 "+.roll" <- function(obj, incr) {
+  # addition method for class "roll"
   if (length(incr) != 1 | incr <= 0) {
     stop("\ninvalid increament")
   }
@@ -168,8 +205,11 @@ plot.roll <- function(x, ...) {
 }
 
 
-# check class "roll"
+#' @rdname roll
+#' @param x an R object
+#' @export
 is.roll <- function(x) {
+  # check class "roll"
   inherits(x, "roll")
 }
 
