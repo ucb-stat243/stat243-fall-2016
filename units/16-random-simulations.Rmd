@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE, error = TRUE)
 
 ## Random Numebrs
 
-Random numbers have many application in science and computer propgramming,
+Random numbers have many applications in science and computer programming,
 especially when there are significant uncertainties in a phenomenon of interest.
 The goal of this unit is to look at some practical problmes involving working
 with random numbers and creating simulations.
@@ -21,7 +21,7 @@ with random numbers and creating simulations.
 The key idea in computer simulations with random numbers is first to formulate
 an algorithmic description of the phenomenon we want to study. This description
 frequently maps directly onto a simple R script, where we use random numbers to
-mimix the uncertain features of the phenomenon. The script needs to perform a
+mimic the uncertain features of the phenomenon. The script needs to perform a
 large number of repeated calculations, and the final answers are only 
 approximate, but the accuracy can usually be made good enough for practical
 purposes.
@@ -53,7 +53,7 @@ runif(4)
 ```
 
 If we set the seed to `123` again, the sequence of uniform random numbers is
-regenrated:
+regenerated:
 ```{r}
 set.seed(123)
 runif(4)
@@ -120,7 +120,7 @@ Programs that run a large number of experiments and record the outcome of
 events are often called simulation programs. The mathematical technique of
 letting the computer perform lots of experiments based on drawing random
 numbers is commonly called __Monte Carlo simulation__. Many probabilistic
-problems can be calculated exaclty by mathematics from probability theory, 
+problems can be calculated exactly by mathematics from probability theory, 
 but very often Monte Carlo simulation is the only way to solve statistical
 problems.
 
@@ -139,7 +139,7 @@ box
 sample(box, 3)
 ```
 
-In this example you can apply theprobability rules to find the probability of
+In this example you can apply the probability rules to find the probability of
 getting at least two blue balls from drawing three balls out of the box. But
 let's see how to use Monte Carlo simulation to find an approximate value for
 such probability. We are going to simulate 1000 repetitions of the experiment.
