@@ -27,7 +27,12 @@ shinyUI(fluidPage(
                    label = "proportion of heads", 
                    min = 0,
                    max = 1,
-                   value = 0.5)
+                   value = 0.5),
+       numericInput("seed",
+                    label = "Random Seed",
+                    value = 67893),
+       h4("Number of heads:"),
+       textOutput("heads")
     ),
     
     # Show a plot of the generated distribution
