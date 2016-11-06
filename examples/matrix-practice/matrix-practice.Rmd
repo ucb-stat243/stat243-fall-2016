@@ -16,40 +16,83 @@ read_chunk('matrix-practice-chunks.R')
 
 # Basic Vector and Matrix manipulations in R
 
+If you have no or minimal experience in R working with matrices, please go over
+this section. If you are already familiar with this material, skip to the next
+section.
+
 Consider the following vector `x`:
 ```{r vectorx}
 ```
 
-Use the vector `x` as input of the function `matrix()` to create the
+- Use the vector `x` as input of the function `matrix()` to create the
 following matrix:
 ```{r matrix1, echo = FALSE, comment=''}
 ```
 
-Using `x` and `matrix()`, how would you generate a matrix like this:
+- Using `x` and `matrix()`, how would you generate a matrix like this:
 ```{r matrix2, echo = FALSE, comment=''}
 ```
 
-Use `diag()` to create the following identity matrix $\mathbf{I}_n$ of 
+- Use `diag()` to create the following identity matrix $\mathbf{I}_n$ of 
 dimensions $n \times p$ = (5, 5):
 ```{r identity5, echo = FALSE, comment=''}
 ```
 
-Consider the following vectors `a1, a2, a3`:
+- Consider the following vectors `a1, a2, a3`:
 ```{r vectors-a}
 ```
 
-Column-bind the vectors `a1, a2, a3` to form this matrix:
+- Column-bind the vectors `a1, a2, a3` to form this matrix:
 ```{r matrix3, echo = FALSE, comment=''}
 ```
 
-Now row-bind the vectors `a1, a2, a3` to form this matrix:
+- Now row-bind the vectors `a1, a2, a3` to form this matrix:
 ```{r matrix4, echo = FALSE, comment=''}
 ```
+
+- Using matrix functions like transpose `t()` and product `%*%`, write a function 
+`vnorm()` that computes the Euclidean norm (i.e. length) of a vector: 
+$\| \mathbf{x} \| = \sqrt{\mathbf{x^\mathsf{T} x}}$.
+
+```{r eval = FALSE}
+# test vnorm() with 1:5
+v <- 1:5
+vnorm(v)
+```
+
+- Given the vector `v <- 1:5`, use `vnorm()` to create a vector `u` such that
+`u` is of unit norm: $\| \mathbf{u} \| = 1$.
+
+- Write a function `is_square()` to check whether the provided matrix is a 
+square matrix.
+
+- Write a function `mtrace()` to compute the trace of a square matrix. Use 
+your `is_square()` function to make sure that the input is a square matrix.
+The trace is defined as the sum of the elements on the diagonal:
+$tr(\mathbf{A}) = \sum_{i=1}^{n} a_{ii}$
+
+- Given two square matrices $\mathbf{A}$ and $\mathbf{B}$, verify that your 
+function `tr()` is a linear mapping:
+    + $tr(\mathbf{A+B}) = tr(\mathbf{A}) + tr(\mathbf{A})$
+    + $tr(c \mathbf{A}) = c \times tr(\mathbf{A})$, where $c$ is a scalar
+    
+- Trace of products: Given two matrices $\mathbf{X}$ and $\mathbf{Y}$ of 
+adequate size, verify that:
+$$
+tr(\mathbf{X^\mathsf{T} Y}) = tr(\mathbf{X Y^\mathsf{T}}) = tr(\mathbf{Y^\mathsf{T} X}) = tr(\mathbf{Y X^\mathsf{T}})
+$$
+
+- Cross-products: Use `proc.time()` or `system.time()` to compare the 
+`t(X) %*% X` against `crossprod(X)`
+
+- Cross-products: Use `proc.time()` or `system.time()` to compare the 
+`X %*% t(X)` against `tcrossprod(X)`
 
 
 # Transformation and Scaling Operations
 
-In this section you will be using the built in data.frame `mtcars`:
+In this section you will be using the built in data.frame `mtcars` to practice
+transforming and scaling operations:
 
 ```{r}
 head(mtcars)
@@ -108,6 +151,17 @@ You should get a table like this:
 <<identity5>>
 <<matrix3>>
 <<matrix4>>
+```
+
+```{r}
+<<vnorm>>
+<<unitnorm>>
+<<is_square>>
+<<mtrace>>
+<<lineartrace>>
+<<prodtrace>>
+<<crossprod>>
+<<tcrossprod>>
 ```
 
 ```{r}

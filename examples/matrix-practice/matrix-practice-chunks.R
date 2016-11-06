@@ -35,6 +35,85 @@ colnames(M4) <- 1:ncol(M4)
 M4
 
 
+## @knitr vnorm
+# vector norm
+vnorm <- function(x) {
+  sqrt(t(x) %*% x)
+}
+
+vnorm(1:5)
+
+
+## @knitr unitnorm
+# vector of unit norm
+v <- 1:5
+u <- v / vnorm(v)
+vnorm(u)
+
+
+## @knitr is_square
+# is a matrix square
+is_square <- function(m) {
+  nrow(m) == ncol(m)
+}
+
+is_square(matrix(1:9, 3, 3))
+
+
+## @knitr mtrace
+# function for trace of a matrix
+mtrace <- function(m) {
+  if (!is_square(m)) {
+    stop("\n'mtrace()' requires a square matrix")
+  }
+  sum(diag(m))
+}
+
+mtrace(matrix(1:9, nrow = 3, ncol = 3))
+
+
+## @knitr lineartrace
+# trace is a linear mapping 
+set.seed(123)
+A <- matrix(sample(1:9, 9), nrow = 3, ncol = 3)
+B <- matrix(sample(1:9, 9), nrow = 3, ncol = 3)
+
+mtrace(A + B)
+mtrace(A) + mtrace(B)
+
+mtrace(3 * A)
+3 * mtrace(A)
+
+
+## @knitr prodtrace
+# trace of a product
+set.seed(123)
+X <- matrix(sample(1:12, 12), nrow = 4, ncol = 3)
+Y <- matrix(sample(1:12, 12), nrow = 4, ncol = 3)
+
+mtrace(t(X) %*% Y)
+mtrace(X %*% t(Y))
+mtrace(t(Y) %*% X)
+mtrace(Y %*% t(X))
+
+
+## @knitr crossprod
+# crossproduct
+set.seed(345)
+X <- matrix(runif(100000), 1000, 100)
+system.time(t(X) %*% X)
+system.time(crossprod(X))
+
+
+## @knitr tcrossprod
+# tcrossproduct
+set.seed(345)
+Y <- matrix(runif(100000), 100, 1000)
+system.time(Y %*% t(Y))
+system.time(tcrossprod(Y))
+
+
+
 ## @knitr transformations
 M <- as.matrix(mtcars[ ,c('mpg', 'disp', 'hp', 'drat', 'wt')])
 
