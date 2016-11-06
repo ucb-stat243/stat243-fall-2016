@@ -1,0 +1,124 @@
+---
+title: "Matrix Algebra"
+author: "Gaston Sanchez"
+date: "November 7, 2016"
+output: pdf_document
+fontsize: 11pt
+urlcolor: blue
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, error = TRUE)
+library(knitr)
+read_chunk('matrix-practice-chunks.R')
+```
+
+
+# Basic Vector and Matrix manipulations in R
+
+Consider the following vector `x`:
+```{r vectorx}
+```
+
+Use the vector `x` as input of the function `matrix()` to create the
+following matrix:
+```{r matrix1, echo = FALSE, comment=''}
+```
+
+Using `x` and `matrix()`, how would you generate a matrix like this:
+```{r matrix2, echo = FALSE, comment=''}
+```
+
+Use `diag()` to create the following identity matrix $\mathbf{I}_n$ of 
+dimensions $n \times p$ = (5, 5):
+```{r identity5, echo = FALSE, comment=''}
+```
+
+Consider the following vectors `a1, a2, a3`:
+```{r vectors-a}
+```
+
+Column-bind the vectors `a1, a2, a3` to form this matrix:
+```{r matrix3, echo = FALSE, comment=''}
+```
+
+Now row-bind the vectors `a1, a2, a3` to form this matrix:
+```{r matrix4, echo = FALSE, comment=''}
+```
+
+
+# Transformation and Scaling Operations
+
+In this section you will be using the built in data.frame `mtcars`:
+
+```{r}
+head(mtcars)
+```
+
+- Create a matrix `M` with variables `mpg`, `disp`, `hp`, `drat`, and `wt`.
+- Use `apply()` to compute the vector containing the means of the columns in `M`
+- Compute a matrix `Mc` of mean-centered data applying the function `scale()`
+on `M` (do NOT `scale = TRUE`).
+- Confirm that variables in `Mc` are mean-centered by calculating the vector
+of column-means
+- Use the function `sweep()` to mean-center `M` by _sweeping out_ the vector of
+column means. Compare this result with `Mc` (you should get the same values).
+- Compute a vector of column maxima.
+- Use `sweep()` to scale the columns by dividing by the column maxima.
+- Compute a matrix in which all columns are scaled to have minimum = 0 and
+maximum = 1
+
+- Write a function `dummify()` that takes a factor or a character vector, and 
+which returns a matrix with dummy indicators. Assuming that the factor has $k$ categories (i.e. $k$ `levels`), include an argument `all` that lets you specify 
+whether to return $k$ binary indicators, or $k-1$ indicators. You should
+be able to call `dummify()` like this:
+```{r eval = FALSE}
+cyl <- factor(mtcars$cyl)
+# all categories
+CYL1 <- dummify(cyl, all = TRUE)
+# minus one category
+CYL2 <- dummify(cyl, all = FALSE)
+```
+
+- Write a function `crosstable()` that takes two factors, and which returns 
+a cross-table between those factors. To create this function you should use 
+your function `dummify()` to compute two dummy matrices, and then multiple them.
+```{r eval = FALSE}
+cyl <- factor(mtcars$cyl)
+gear <- factor(mtcars$gear)
+xtb <- crosstable(cyl, gear)
+```
+
+You should get a table like this:
+```
+   3 4 5
+4  1 8 2
+6  2 4 1
+8 12 0 2
+```
+
+
+\newpage
+
+# Solutions
+
+```{r}
+<<matrix1>>
+<<matrix2>>
+<<identity5>>
+<<matrix3>>
+<<matrix4>>
+```
+
+```{r}
+<<transformations>>
+```
+
+```{r}
+<<dummify>>
+```
+
+```{r}
+<<crosstable>>
+```
+
