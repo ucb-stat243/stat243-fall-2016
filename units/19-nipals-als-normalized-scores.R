@@ -26,7 +26,7 @@ tolerance <- 0.0001
 criterion <- 1
 iterations <- 0
 
-while ((criterion > tolerance) | (iterations > 100)) {
+while ((criterion > tolerance) & (iterations < 100)) {
   iterations <- iterations + 1
   z <- X %*% w_old
   # normalized z

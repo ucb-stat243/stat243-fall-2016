@@ -9,7 +9,7 @@ diff <- 1
 tolerance <- 0.00001
 iterations <- 0
 
-while (diff > tolerance) {
+while ((diff > tolerance) & (iterations < 100)) {
   iterations <- iterations + 1
   u_new <- S %*% u_old
   u_new <- u_new / sqrt(sum(u_new * u_new))
