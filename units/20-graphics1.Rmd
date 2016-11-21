@@ -1,0 +1,557 @@
+---
+title: "Stat 243"
+subtitle: "Base Graphics (part 1)"
+author: "Gaston Sanchez"
+date: "Creative Commons Attribution 4.0 International License"
+output: 
+  beamer_presentation:
+    includes:
+      in_header: header.tex
+---
+
+```{r, setup, include=FALSE}
+library(knitr)
+# smaller font size for chunks
+knitr::opts_chunk$set(size = 'footnotesize')
+options(width=78)
+```
+
+# 
+
+\begin{center}
+\Huge{\hilit{Graphics}}
+\end{center}
+
+
+# References
+
+Some Resources
+
+- __R Graphics__ by Paul Murrell
+- __R Graphics Cookbook__ by Winston Chang
+- __ggplot2: Elegant Graphics for Data Analysis__ by Hadley Wickham
+- __R Graphs Cookbook__ by Hrishi Mittal
+- __Graphics for Statistics and Data Analysis with R__ by Kevin Keen
+
+
+
+# Two main graphic systems
+
+\centerline{\mdlit \Large 2 main graphics systems}
+
+\bigskip
+\centerline{\Large "graphics" \quad \& \quad "grid"}
+
+
+# Basics of Graphics in R
+
+## Graphics Systems
+
+- `"graphics"` and `"grid"` are the two main graphics systems in R
+- `"graphics"` is the _traditional_ system, also referred to as _base graphics_
+- `"grid"` prodives low-level functions for programming plotting functions
+
+
+# Basics of Graphics in R
+
+## Graphics Engine
+
+- Underneath `"graphics"` and `"grid"` there is the package `"grDevices"`
+- `"grDevices"` is the graphics __engine__ in R
+- It provides the graphics devices and support for colors and fonts
+
+
+# 
+
+\begin{center}
+\includegraphics[width=8cm]{graphic_systems.pdf}
+\end{center}
+
+
+# Basics of Graphics in R
+
+## Package `"graphics"`
+
+The package `"graphics"` is the traditional system; it provides functions for 
+complete plots, as well as low-level facilities. 
+
+\bigskip
+
+Many other graphics packages are built on top of graphics like `"maps"`, `"diagram"`, `"pixmap"`, and many more.
+
+
+# Understanding Graphics in R
+
+## Package `"grid"`
+
+The `"grid"` package does not provide functions for drawing complete plots.
+
+\bigskip
+
+`"grid"` is not used directly to produce statistical plots. Instead, it is 
+used to build other graphics packages like `"lattice"` or `"ggplot2"`.
+
+
+# 
+
+\begin{center}
+\Huge{\hilit{Traditional (Base) Graphics}}
+\end{center}
+
+
+# Base Graphics in R
+
+## Types of graphics functions
+
+Graphics functions can be divided into two main types:
+
+- __high-level__ functions produce complete plots, e.g. `barplot()`, 
+`boxplot()`, `dotchart()`
+- __low-level__ functions add further output to an existing plot, e.g. 
+`text()`, `points()`, `legend()`
+
+
+# The `plot()` function
+
+- `plot()` is the most important high-level function in traditional graphics
+- The first argument to `plot()` provides the data to plot
+- The provided data can take different forms: e.g. vectors, factors, matrices, 
+data frames.
+- To be more precise, `plot()` is a generic function
+- You can create your own `plot()` method function
+
+
+# Basic Plots with `plot()`
+
+In its basic form, we can use `plot()` to make graphics of:
+
+- one single variable
+- two variables
+- multiple variables
+
+
+#
+
+\begin{center}
+\Huge{\hilit{Plots of One Variable}}
+\end{center}
+
+
+# High-level graphics of a single variable
+
+| Function | Data      | Description |
+|----------| ----------|-------------|
+| `plot()` | numeric   | scatterplot |  
+| `plot()` | factor    | barplot     |
+| `plot()` | 1-D table | barplot     |
+
+\bigskip
+
+`numeric` can be either a vector or a 1-D array 
+(e.g. row or column from a matrix) 
+
+
+# Examples
+
+```{r plot_single1, eval=FALSE, echo=-c(1,14)}
+op <- par(mfrow = c(1, 3))
+# plot numeric vector
+num_vec <- (c(1:10))^2
+plot(num_vec)
+
+# plot factor
+set.seed(4)
+abc <- factor(sample(c('A', 'B', 'C'), 20, 
+                     replace = TRUE))
+plot(abc)
+
+# plot 1D-table
+abc_table <- table(abc)
+plot(abc_table)
+par(op)
+```
+
+
+#
+
+```{r plot_single1, fig.width=7, fig.height=4, out.width='.9\\linewidth', out.height='.4\\linewidth', fig.align='center', echo=FALSE}
+```
+
+
+# More high-level graphics of a single variable
+
+\begin{center}
+ \begin{tabular}{l l l}
+  \hline
+   Function & Data & Description \\
+  \hline
+  \code{barplot()} & numeric & barplot \\
+  \code{pie()} & numeric & pie chart  \\
+  \code{dotchart()} & numeric & dotplot \\
+   & & \\
+  \code{boxplot()} & numeric & boxplot \\
+  \code{hist()} & numeric & histogram  \\
+  \code{stripchart()} & numeric & 1-D scatterplot \\
+  \code{stem()} & numeric & stem-and-leaf plot \\
+  \hline
+ \end{tabular}
+\end{center}
+
+
+# Kernel Density Curve
+
+- Surprisingly, R does not have a specific function to plot density curves
+- R does have the `density()` function which computes a kernel density estimate
+- We can pass a `"density"` object to `plot()` in order to get a density curve.
+
+
+
+# Kernel Density Curve
+
+```{r fig.width=4, fig.height=4, out.width='.5\\linewidth', out.height='.5\\linewidth', fig.align='center'}
+# kernel density curve
+dens <- density(num_vec)
+plot(dens)
+```
+
+
+#
+
+\begin{center}
+\Huge{\hilit{Plots of Two Variables}}
+\end{center}
+
+
+# High-level graphics of two variables
+
+\begin{center}
+ \begin{tabular}{l l l}
+  \hline
+   Function & Data & Description \\
+  \hline
+  \code{plot()} & numeric, numeric & scatterplot \\  
+  \code{plot()} & numeric, factor & stripcharts \\
+  \code{plot()} & factor, numeric & boxplots \\
+  \code{plot()} & factor, factor & spineplot \\
+  \code{plot()} & 2-column numeric matrix & scatterplot \\  
+  \code{plot()} & 2-column numeric data.frame & scatterplot \\  
+  \code{plot()} & 2-D table & mosaicplot \\
+  \hline
+ \end{tabular}
+\end{center}
+
+
+# Plots of two variables
+
+```{r plot_twovars, eval=FALSE, echo=-c(1,13)}
+op <- par(mfrow = c(1, 3))
+# plot numeric, numeric
+plot(iris$Petal.Length, iris$Sepal.Length)
+
+# plot numeric, factor
+plot(iris$Petal.Length, iris$Species)
+
+# plot factor, numeric
+plot(iris$Species, iris$Petal.Length)
+
+# plot factor, factor
+plot(iris$Species, iris$Species)
+par(op)
+```
+
+
+# Plots of two variables
+
+```{r fig.width=5, fig.height=4, out.width='.7\\linewidth', out.height='.6\\linewidth', fig.align='center'}
+# plot numeric, numeric
+plot(iris$Petal.Length, iris$Sepal.Length)
+```
+
+
+# Plots of two variables
+
+```{r fig.width=5, fig.height=4, out.width='.7\\linewidth', out.height='.6\\linewidth', fig.align='center'}
+# plot numeric, factor
+plot(iris$Petal.Length, iris$Species)
+```
+
+
+# Plots of two variables
+
+```{r fig.width=5, fig.height=4, out.width='.7\\linewidth', out.height='.6\\linewidth', fig.align='center'}
+# plot factor, numeric
+plot(iris$Species, iris$Petal.Length)
+```
+
+
+# Plots of two variables
+
+```{r fig.width=6, fig.height=6, out.width='.7\\linewidth', out.height='.6\\linewidth', fig.align='center'}
+# plot factor, factor
+plot(iris$Species, iris$Species)
+```
+
+
+# More high-level graphics of two variables
+
+\footnotesize{
+\begin{center}
+ \begin{tabular}{l l l}
+  \hline
+   Function & Data & Description \\
+  \hline
+  \code{sunflowerplot()} & numeric, numeric & sunflower scatterplot \\
+  \code{smoothScatter()} & numeric, numeric & smooth scatterplot \\
+   & & \\
+  \code{boxplot()} & list of numeric & boxplots \\
+  \code{barplot()} & matrix & stacked / side-by-side barplot  \\
+  \code{dotchart()} & matrix & dotplot \\
+   & & \\
+  \code{stripchart()} & list of numeric & stripcharts \\
+  \code{spineplot()} & numeric, factor & spinogram  \\
+  \code{cdplot()} & numeric, factor & conditional density plot  \\
+   & & \\
+  \code{fourfoldplot()} & 2x2 table & fourfold display \\
+  \code{assocplot()} & 2-D table & association plot \\  
+  \code{mosaicplot()} & 2-D table & mosaic plot \\
+  \hline
+ \end{tabular}
+\end{center}
+}
+
+
+#
+
+\begin{center}
+\Huge{\hilit{Base Graphics}}
+\end{center}
+
+
+# Graphics in R
+
+## Traditional Graphics
+
+- R `"graphics"` follows a static, "painting on canvas" model.
+- Graphics elements are drawn, and remain visible until painted over.
+- For dynamic and/or interactive graphics, base R graphics are limited.
+
+
+# Traditional Graphics}
+
+## Traditional graphics model
+
+In the traditional model, we create a plot by first calling a high-level 
+function that creates a complete plot, and then we call low-level functions 
+to add more output if necessary
+
+
+# Dataset `mtcars`
+
+```{r}
+head(mtcars)
+```
+
+
+# Scatter plot
+
+```{r mtcars1, fig.width=5, fig.height=4, out.width='.8\\linewidth', out.height='.55\\linewidth', fig.align='center'}
+# simple scatter-plot
+plot(mtcars$mpg, mtcars$hp)
+```
+
+
+# Axis Labels
+
+```{r mtcars2, eval = FALSE}
+# xlab and ylab
+plot(mtcars$mpg, mtcars$hp, 
+     xlab = "miles per gallon",
+     ylab = "horsepower")
+```
+
+
+# Axis Labels
+
+```{r mtcars2, fig.width=5, fig.height=4, out.width='.85\\linewidth', out.height='.6\\linewidth', fig.align='center', echo = FALSE}
+```
+
+
+# Title and Subtitle
+
+```{r mtcars3, eval = FALSE}
+# title and subtitle
+plot(mtcars$mpg, mtcars$hp, 
+     xlab = "miles per gallon",
+     ylab = "horsepower", 
+     main = "Simple Scatterplot",
+     sub = 'data mtcars')
+```
+
+
+# Title and Subtitle
+
+```{r mtcars3, fig.width=5, fig.height=4, out.width='.85\\linewidth', out.height='.7\\linewidth', fig.align='center', echo = FALSE}
+```
+
+
+# x and y coordinate ranges
+
+```{r mtcars4, eval = FALSE}
+# 'xlim' and 'ylim'
+plot(mtcars$mpg, mtcars$hp,
+     xlim = c(10, 35), 
+     ylim = c(50, 400),
+     xlab = "miles per gallon",
+     ylab = "horsepower", 
+     main = "Simple Scatterplot",
+     sub = 'data mtcars')
+```
+
+
+# x and y coordinate ranges
+
+```{r mtcars4, fig.width=5, fig.height=4, out.width='.85\\linewidth', out.height='.7\\linewidth', fig.align='center', echo = FALSE}
+```
+
+
+# Points
+
+```{r mtcars5, eval = FALSE}
+# character expansion 'cex' and 'point character'
+plot(mtcars$mpg, mtcars$hp,
+     xlim = c(10, 35), 
+     ylim = c(50, 400),
+     cex = 1.5, 
+     pch = 1,
+     xlab = "miles per gallon",
+     ylab = "horsepower", 
+     main = "Simple Scatterplot",
+     sub = 'data mtcars')
+```
+
+
+# Points
+
+```{r mtcars5, fig.width=5, fig.height=4, out.width='.85\\linewidth', out.height='.7\\linewidth', fig.align='center', echo = FALSE}
+```
+
+
+# Point symbols `pch` available in R
+
+```{r points_pch, size='scriptsize', fig.width=4, fig.height=4, out.width='.6\\linewidth', out.height='.6\\linewidth', fig.align='center', echo=FALSE}
+x <- rep(1:5, times = 5)
+y <- rep(5:1, each = 5)
+op <- par(mar = c(1,1,1,1))
+plot(x, y, pch = 1:25, axes = FALSE, xlab = '', ylab = '',
+     ylim = c(0.5, 5), cex = 1.5)
+text(x, y, pch = 1:25, labels = 1:25, pos = 1, offset = 0.8)
+par(op)
+```
+
+
+# Point Character
+
+```{r fig.width=5, fig.height=4, out.width='.85\\linewidth', out.height='.6\\linewidth', fig.align='center', size='scriptsize'}
+# 'pch' can be any character
+plot(mtcars$mpg, mtcars$hp, pch = "@")
+```
+
+
+# Point Colors
+
+```{r fig.width=5, fig.height=4, out.width='.85\\linewidth', out.height='.6\\linewidth', fig.align='center', size='scriptsize'}
+# color argument 'col'
+plot(mtcars$mpg, mtcars$hp, pch=19, col="blue", cex=1.2)
+```
+
+
+# Coloring Point Symbols
+
+- the `col` argument can be used to color symbols
+- symbols 21 through 25 can additionally have
+their interiors filled by using the `bg` (background) argument
+
+
+# Coloring Point symbols
+
+```{r points_cols, size='scriptsize', fig.width=4, fig.height=4, out.width='.6\\linewidth', out.height='.6\\linewidth', fig.align='center', echo=FALSE}
+x <- rep(1:5, times = 5)
+y <- rep(5:1, each = 5)
+cols <- c("tomato", "orange", "green3", "blue", "purple")
+op <- par(mar = c(1,1,1,1))
+plot(x, y, pch = 1:25, axes = FALSE, xlab = '', ylab = '',
+     ylim = c(0.5, 5), col = cols, bg = cols, cex = 2)
+text(x, y, pch = 1:25, labels = 1:25, pos = 1, offset = 0.8)
+par(op)
+```
+
+
+# Drawing Error Bars
+
+Randomly generate 5 groups of 20 observations each.
+
+```{r}
+groups <- rep(1:5, each = 20)
+means <- c(5, 7, 6, 9, 8)
+y <- rnorm(100) + rep(means, each = 20)
+```
+
+Display the data is with parallel boxplots.
+
+```{r group-boxplots, eval = FALSE}
+boxplot(y ~ groups, main = "Simulated Grouped Data")
+```
+
+
+# Grouped Box-plots
+
+```{r group-boxplots, fig.width=6, fig.height=4, out.width='.9\\linewidth', out.height='.6\\linewidth', fig.align='center', echo=FALSE}
+```
+
+
+# Error bars
+
+Rather than using boxplots, we can create a new plot that displays the data 
+values and shows the mean with error bars.
+
+```{r error-bars, eval = FALSE}
+ybar <- sapply(split(y, groups), mean)
+ysd <- sapply(split(y, groups), sd)
+plot(groups, y, xlim = c(1, 5.25), 
+     xlab = "Group", ylab = "Values",
+     main = "Data with Means and Error Bars")
+points(1:5 + .25, ybar, pch=19)
+arrows(1:5 + .25, ybar - 2 * ysd/sqrt(20),
+       1:5 + .25, ybar + 2 * ysd/sqrt(20),
+       code = 3, angle = 90, length = .1)
+```
+
+
+# Error bars
+
+```{r error-bars, fig.width=6, fig.height=4, out.width='.9\\linewidth', out.height='.6\\linewidth', fig.align='center', echo=FALSE}
+```
+
+
+# Adding some jitter
+
+Notice that it is hard to see the individual data points because of overplotting.
+This can be fixed (adding a small amount of random variation in the `x` direction).
+
+```{r jitter, eval = FALSE}
+plot(groups + runif(100, -.05, .05), y, 
+     xlim = c(1, 5.25), 
+     xlab = "Group", ylab = "Values",
+     main = "Data with Means and Error Bars")
+points(1:5 + .25, ybar, pch=19)
+arrows(1:5 + .25, ybar - 2 * ysd/sqrt(20),
+       1:5 + .25, ybar + 2 * ysd/sqrt(20),
+       code = 3, angle = 90, length = .1)
+```
+
+
+# Adding jitter
+
+```{r jitter, fig.width=6, fig.height=4, out.width='.9\\linewidth', out.height='.6\\linewidth', fig.align='center', echo=FALSE}
+```
+

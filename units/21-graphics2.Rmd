@@ -1,0 +1,618 @@
+---
+title: "Stat 243"
+subtitle: "Base Graphics (part 2)"
+author: "Gaston Sanchez"
+date: "Creative Commons Attribution 4.0 International License"
+output: 
+  beamer_presentation:
+    includes:
+      in_header: header.tex
+---
+
+```{r, setup, include=FALSE}
+library(knitr)
+# smaller font size for chunks
+knitr::opts_chunk$set(size = 'footnotesize')
+options(width=78)
+```
+
+# 
+
+\begin{center}
+\Huge{\hilit{Low-Level Functions}}
+\end{center}
+
+
+# High and Low level functions
+
+- Usually we call a high-level function
+- Most times we change the default arguments
+- Then we call low-level functions
+
+
+# Scatter plot
+
+```{r mtcars_plot1, eval = FALSE}
+# simple scatter-plot
+plot(mtcars$mpg, mtcars$hp)
+
+# adding text
+text(mtcars$mpg, mtcars$hp, labels = rownames(mtcars))
+
+# dummy legend
+legend("topright", legend = "a legend")
+
+# graphic title
+title("Miles Per Galon -vs- Horsepower")
+```
+
+
+#
+
+```{r mtcars_plot1, fig.width=7, fig.height=5.5, out.width='.8\\linewidth', out.height='.7\\linewidth', fig.align='center', echo = FALSE}
+```
+
+
+# Scatter plot
+
+```{r mtcars_plot2, eval = FALSE}
+# simple scatter-plot
+plot(mtcars$mpg, mtcars$hp, type = "n", 
+     xlab = "miles per gallon", ylab = "horsepower")
+# grid lines
+abline(v = seq(from=10, to=30, by=5), col = 'gray')
+abline(h = seq(from=50, to=300, by=50), col = ' gray')
+# plot points
+points(mtcars$mpg, mtcars$hp, pch = 19, col = "blue")
+# plot text
+text(mtcars$mpg, mtcars$hp, labels = rownames(mtcars),
+     pos = 4, col = "gray50")
+# graphic title
+title("Miles Per Galon -vs- Horsepower")
+```
+
+
+# 
+
+```{r mtcars_plot2, fig.width=7, fig.height=5.5, out.width='.8\\linewidth', out.height='.7\\linewidth', fig.align='center', echo = FALSE}
+```
+
+
+# Low-level functions
+
+\begin{center}
+ \begin{tabular}{l l}
+  \hline
+   Function & Description \\
+  \hline
+  \code{points()} & points \\  
+  \code{lines()} & connected line segments \\
+  \code{abline()} & straight lines across a plot \\
+  \code{segments()} & disconnected line segments \\
+  \code{arrows()} & arrows \\
+  \code{rect()} & rectangles \\
+  \code{polygon()} & polygons \\
+  \code{text()} & text \\
+  \code{symbols()} & various symbols \\
+  \code{legend()} & legends \\
+  \hline
+ \end{tabular}
+\end{center}
+
+
+# Drawing Points with `points()`
+
+```
+points(x, y, pch = int, col = str)
+```
+
+- `pch` integer or string indicating type of point character
+- `col` color of points
+
+
+#
+
+```{r size='scriptsize', fig.width=4, fig.height=4, out.width='.8\\linewidth', out.height='.6\\linewidth', fig.align='center'}
+# drawing points
+plot(mtcars$mpg, mtcars$hp, type = "n")
+points(mtcars$mpg, mtcars$hp)
+```
+
+
+# Connected Line Segments
+
+```
+lines(x, y, lty = str, lwd = num, col = str)
+```
+
+- `lty` specifies the line texture.
+- It should be one of `"blank"` (0), `"solid"` (1), `"dashed"` (2), 
+`"dotted"` (3), `"dotdash"` (4), `"longdash"` (5) or `"twodash"` (6).
+- `lwd` and `col` specify the line width and color
+
+
+# 
+
+```{r size='scriptsize', fig.width=4, fig.height=4, out.width='.7\\linewidth', out.height='.6\\linewidth', fig.align='center'}
+# connected lines
+plot(mtcars$mpg, mtcars$hp, type = "n")
+lines(mtcars$mpg, mtcars$hp, type = "s", lwd = 2)
+```
+
+
+# Line Graph Options
+
+The `type` argument can be used to produced other types of lines
+
+- `type = "l"` line graph
+- `type = "s"` step function (horizontal first)
+- `type = "S"` step function (vertical first)
+- `type = "h"` high density (needle) plot
+- `type = "p"` draw points
+- `type = "b"` draw points and lines
+- `type = "o"` over-plotting points and lines
+
+
+# Line Graph Options
+
+```{r line_types, size='scriptsize', fig.width=7, fig.height=4, out.width='.9\\linewidth', out.height='.6\\linewidth', fig.align='center', echo=FALSE}
+set.seed(5)
+x <- 1:20
+y <- x + runif(20)
+ltypes = c("l", "s", "S", "h")
+op <- par(mfrow = c(2, 2))
+for (i in 1:4) {
+  ops <- par(mar = rep(1, 4))
+  plot(x, y, axes = FALSE, xlab = '', ylab = '', type = "n")
+  lines(x, y, lwd = 2, type = ltypes[i])
+  legend("topleft", legend = sprintf("type = '%s'", ltypes[i]), bty = "n")
+  box()
+  par(ops)
+}
+par(op)
+```
+
+
+# Connected Line Segments
+
+```{r line_segs, eval=FALSE}
+x <- 2005:2015
+y <- c(81, 83, 84.3, 85, 85.4, 86.5, 88.3, 
+       88.6, 90.8, 91.1, 91.3)
+
+plot(x, y, type = 'n', xlab = "Time", ylab = "Values")
+lines(x, y, lwd = 2)
+title(main = "Line Graph Example")
+```
+
+
+# Connected Line Segments
+
+```{r line_segs, size='scriptsize', fig.width=6, fig.height=4, out.width='.8\\linewidth', out.height='.6\\linewidth', fig.align='center', echo=FALSE}
+```
+
+
+# Drawing Straight Lines
+
+```
+abline(a = intercept, b = slope)
+abline(h = numbers)
+abline(v = numbers)
+```
+
+- The `a / b` form specifies a line in intercept / slope form
+- `h` specifies horizontal lines at given y-values
+- `v` specifies vartical lines at given x-values
+
+
+# 
+
+```{r size='scriptsize', fig.width=4, fig.height=4, out.width='.6\\linewidth', out.height='.6\\linewidth', fig.align='center'}
+# drawing straight lines
+plot(mtcars$mpg, mtcars$hp, type = "n")
+abline(v = seq(10, 30, by = 5), h = seq(50, 300, by = 50))
+points(mtcars$mpg, mtcars$hp, pch = 19, col = "red")
+```
+
+
+# Drawing Disconnected Lines
+
+Disconnected lines can be drawn with the function:
+
+```
+segments(x0, y0, x1, y1)
+```
+
+- The `x0, y0, x1, y1` arguments give the start and end coordinates of the segments.
+- Line texture, colour and width arguments can also be
+given.
+
+
+# Drawing Line Segments
+
+```{r segments, eval=FALSE}
+n <- 11
+theta <- seq(0, 2 * pi, length = n + 1)[1:n]
+x <- sin(theta)
+y <- cos(theta)
+v1 <- rep(1:n, n)
+v2 <- rep(1:n, rep(n, n))
+
+plot(x, y, type = 'n')
+segments(x[v1], y[v1], x[v2], y[v2])
+```
+
+
+#
+
+```{r segments, size='scriptsize', fig.width=5, fig.height=5, out.width='.8\\linewidth', out.height='.8\\linewidth', fig.align='center', echo=FALSE}
+```
+
+
+# Drawing Polygons}
+
+Polygons can be drawn with the function:
+
+```
+polygon(x, y, col = str, border = str)
+```
+
+- `x, y` give the coordinates of the polygon vertexes. `NA` values separate polygons.
+- `col` specifies the color of the interior.
+- `border` specifies the color of the border.
+- line texture and width specifications can also be given.
+
+
+# Drawing Polygons
+
+```{r polygons, size='scriptsize', fig.width=5, fig.height=5, out.width='.6\\linewidth', out.height='.6\\linewidth', fig.align='center', echo=FALSE}
+mpg_dens <- density(mtcars$mpg)
+plot(mpg_dens, main = "Kernel Density Curve")
+polygon(mpg_dens, col = 'gray')
+```
+
+
+# Adding Text
+
+We can add text using the function:
+
+```
+text(x, y, labels, ...)
+```
+
+- `x, y` give the coordinates of the text.
+- `labels` gives the actual text strings.
+- `font` optional font for the text.
+- `col` optional color for the text.
+- `srt` rotation of the text.
+- `adj` justification of the text.
+
+
+# Drawing Text
+
+```{r draw_text, eval=FALSE}
+plot(0.5, 0.5, xlim = c(0, 1), ylim = c(0, 1), type = 'n')
+abline(h = c(.2, .5, .8),
+       v = c(.5, .2, .8), col = "lightgrey")
+text(0.5, 0.5, "srt = 45, adj = c(.5, .5)",
+     srt = 45, adj = c(.5, .5))
+text(0.5, 0.8, "adj = c(0, .5)", adj = c(0, .5))
+text(0.5, 0.2, "adj = c(1, .5)", adj = c(1, .5))
+text(0.2, 0.5, "adj = c(1, 1)", adj = c(1, 1))
+text(0.8, 0.5, "adj = c(0, 0)", adj = c(0, 0))
+```
+
+
+# Drawing Text
+
+```{r draw_text, size='scriptsize', fig.width=7, fig.height=6, out.width='.8\\linewidth', out.height='.75\\linewidth', fig.align='center', echo=FALSE}
+```
+
+
+# Adding a Legend
+
+Legends can be added with:
+
+```
+legend(xloc, yloc, legend = text
+       lty = linetypes, lwd = linewidths,
+       pch = glyphname, col = colours,
+       xjust = justification, yjust = justification)
+```
+
+- `xloc` and `yloc` give the coordinates where the legend is to be placed
+- `xjust` and `yjust` give the justification of the legend box with respect to
+the location. 
+
+
+# Adding Legends
+
+```{r add_legend, size='scriptsize', fig.width=6, fig.height=5, out.width='.7\\linewidth', out.height='.6\\linewidth', fig.align='center'}
+# coords of exact line
+plot(mtcars$mpg, mtcars$hp)
+legend("topright", legend = "A legend")
+```
+
+
+# 
+
+\begin{center}
+\Huge{\hilit{Plots from scratch}}
+\end{center}
+
+
+# General Recipe
+
+It is also possible to create a plot from scratch. Although this procedure is less documented, it is extremely flexible:
+
+1. call `plot.new()` to start a new plot frame
+2. call `plot.window()` to define coordinates
+3. then call low-level functions:
+4. typical options involve `axis()`
+5. then `title()` (title, subtitle)
+6. after that call other function: e.g. `points()`, `lines()`, etc
+
+
+# Plot from Scratch
+
+```{r bare_plot, eval = FALSE}
+plot.new()
+plot.window(xlim = c(0, 10), ylim = c(-2, 4), xaxs = "i")
+axis(1, col.axis = "grey30")
+axis(2, col.axis = "grey30", las = 1)
+title(main = "Main Title",
+      col.main = "tomato",
+      sub = "Plot Subtitle",
+      col.sub = "orange",
+      xlab = "x-axis", ylab = "y-axis",
+      col.lab = "blue", font.lab = 3)
+box("figure", col = "grey90")
+```
+
+
+# Plot from Scratch
+
+```{r bare_plot, size='scriptsize', fig.width=5, fig.height=5, out.width='.6\\linewidth', out.height='.6\\linewidth', fig.align='center', echo=FALSE}
+```
+
+
+# Another plot from scratch
+
+```{r ablines, eval=FALSE}
+set.seed(5)
+x <- rnorm(200)
+y <- x + rnorm(200)
+
+plot.new()
+plot.window(xlim = c(-4.5, 4.5), xaxs = "i", 
+            ylim = c(-4.5, 4.5), yaxs = "i")
+z <- lm(y ~ x)
+abline(h = -4:4, v = -4:4, col = "lightgrey")
+abline(a = coef(z)[1], b = coef(z)[2], lwd = 2, col = "red")
+points(x, y)
+axis(1)
+axis(2, las = 1)
+box()
+title(main = "A Fitted Regression Line")
+```
+
+
+#
+
+```{r ablines, size='scriptsize', fig.width=7, fig.height=5, out.width='.9\\linewidth', out.height='.7\\linewidth', fig.align='center', echo=FALSE}
+```
+
+
+# Creating a Plot from Scratch
+
+- Start a new plot with plot.new()`
+
+- `plot.new()` opens a new (empty) plot frame
+
+- `plot.new()` chooses a default plotting region
+
+
+# Setting Up Coordinates
+
+Then use `plot.window()` to set up the coordinate system for the plotting frame
+
+```{r eval = FALSE}
+# axis limits (0,1)x(0,1)
+plot.window(xlim = c(0, 1), ylim = c(0, 1))
+```
+
+By default `plot.window()` produces axis limits which are expanded by 6% over 
+those actually specified. 
+
+
+# Setting Up Coordinates
+
+The default limits expansion can be turned-off by specifying `xaxs = "i"` 
+and/or `yaxs = "i"`
+
+```{r eval=FALSE}
+plot.window(xlim, ylim, xaxs = "i")
+```
+
+
+# Aspect Ratio Control
+
+Another important argument is `asp`, which allows us to specify the 
+_aspect ratio_
+
+```{r eval=FALSE}
+plot.window(xlim, ylim, xaxs = "i", asp = 1)
+```
+
+`asp = 1` means that unit steps in the x and y directions produce equal 
+distances in the x and y directions on the plot.
+(Important to avoid distortion of circles that look like ellipses)
+
+
+# Drawing Axes
+
+The `axis()` function can be used to draw axes at any of the four sides of a plot.
+
+- `side=1` below the graph
+- `side=2` to the left of the graph
+- `side=3` above the graph
+- `side=4` to the right of the graph
+
+
+# Customizing Axes
+
+Axes can be customized via several arguments (see `?axis`)
+
+- location of tick-marks
+- labels of axis
+- colors
+- sizes
+- text fonts
+- text orientation 
+
+
+# Plot Annotation
+
+The function `title()` allows us to include labels in the margins
+
+- `main` main title above the graph
+- `sub` subtitle below the graph
+- `xlab` label for the x-axis
+- `ylab` label for the y-axis
+
+
+# Customizing Annotations
+
+The annotations can be customized with additional arguments for the fonts, colors, and size (expansion)
+
+- `font.main, col.main, cex.main`
+- `font.sub, col.sub, cex.sub`
+- `font.lab, col.lab, cex.lab`
+
+
+# Drawing Arrows
+
+Arrows can be drawn with the function:
+
+```
+arrows(x0, y0, x1, y1, code = int, 
+       length = num, angle = num)
+```
+
+- The `x0, y0, x1, y1` arguments give the start and end coordinates.
+- `code=1` head at the start, `code=2` head at the end, `code=3` head at both ends
+- `length` of the arrow head and `angle` to the shaft
+
+
+# Drawing Arrows
+
+```{r arrows, eval=FALSE}
+plot.new()
+plot.window(xlim = c(0, 1), ylim = c(0, 1))
+arrows(.05, .075, .45, .9, code = 1)
+arrows(.55, .9, .95, .075, code = 2)
+arrows(.1, 0, .9, 0, code = 3)
+text(.5, 1, "A", cex = 1.5)
+text(0, 0, "B", cex = 1.5)
+text(1, 0, "C", cex = 1.5)
+```
+
+
+# Drawing Arrows
+
+```{r arrows, size='scriptsize', fig.width=5, fig.height=5, out.width='.6\\linewidth', out.height='.6\\linewidth', fig.align='center', echo=FALSE}
+```
+
+
+# Drawing Rectangles
+
+Rectangles can be drawn with the function:
+
+
+```
+rect(x0, y0, x1, y1, col = str, border = str)
+```
+
+- `x0, y0, x1, y1` give the coordinates of diagonally opposite corners of the rectangles.
+- `col` specifies the color of the interior.
+- `border` specifies the color of the border.
+
+
+# Drawing Rectangles
+
+```{r rectangles, eval=FALSE}
+# barplot manually constructed
+plot.new()
+plot.window(xlim = c(0, 5), ylim = c(0, 10))
+rect(0:4, 0, 1:5, c(7, 8, 4, 3), 
+     col = "turquoise",
+     border = "white")
+axis(1)
+axis(2, las = 1)
+```
+
+
+# Drawing Rectangles
+
+```{r rectangles, size='scriptsize', fig.width=5, fig.height=5, out.width='.7\\linewidth', out.height='.7\\linewidth', fig.align='center', echo=FALSE}
+```
+
+
+#
+
+\begin{center}
+\Huge{\hilit{Plot Regions}}
+\end{center}
+
+
+# Anatomy of Plot Frame and Region
+
+\begin{center}
+\includegraphics[width=8cm]{plot-figure-region.pdf}
+\end{center}
+
+
+# Anatomy of Plot Frame and Region
+
+\begin{center}
+\includegraphics[width=8cm]{plot-figure-region-color.pdf}
+\end{center}
+
+
+# Adjusting the Margins
+
+Margins can be adjusted with the `par()` function in various ways:
+
+- In inches: `par(mai = c(2, 2, 1, 1))`
+- In lines of text: `par(mar = c(4, 4, 2, 2))`
+- Width and Height in inches: `par(pin = c(5, 4))`
+
+
+# One more scatter plot
+
+```{r margins_plot, eval = FALSE}
+# simple scatter-plot
+op <- par(mar = c(5, 4, 3, 1))
+plot(mtcars$mpg, mtcars$hp, type = "n", las = 1,
+     xlab = "miles per gallon", ylab = "horsepower")
+# grid lines
+abline(v = seq(from=10, to=30, by=5), col = 'gray')
+abline(h = seq(from=50, to=300, by=50), col = ' gray')
+# points
+points(mtcars$mpg, mtcars$hp, pch = 19, col = "blue")
+# text (point labels)
+text(mtcars$mpg, mtcars$hp, labels = rownames(mtcars),
+     pos = 4, col = "gray50")
+# title
+title("Miles Per Galon -vs- Horsepower")
+# reset graphical margins
+par(op)
+```
+
+
+#
+
+```{r margins_plot, fig.width=7, fig.height=5.5, out.width='.8\\linewidth', out.height='.7\\linewidth', fig.align='center', echo = FALSE}
+```
+
+
