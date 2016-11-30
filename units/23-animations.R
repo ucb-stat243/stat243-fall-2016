@@ -31,17 +31,32 @@ saveHTML({
 
 # Example 2: Trajectory of Storms
 # data in github repo, see "data/" folder
+library(animation)
+library(rworldmap)
+
 dat <- read.csv("clean-storms-2005.csv")
+
+newmap <- getMap(resolution = "low")
+
+na_lon <- which(dat$longitude <= -20 & dat$longitude >= -140)
+na_lat <- which(dat$latitude >= 0 & dat$latitude <= 80)
+north <- intersect(na_lon, na_lat)
+
+plot(newmap, xlim = c(-140, -20), ylim = c(0, 80), asp = 1,
+     col = "gray95", bg = "#dde9f2", border = "#b5c5d0")
+points(dat$longitude[north], dat$latitude[north], col = "#6591ce55", 
+       pch = 20, cex = dat$wind_speed[north]/40)
 
 saveHTML({
   ani.options(interval = 0.1, nmax = 50)  # create 50 image frames
-  for (i in 1:200) {
-    map("world", col = "gray50", bg = "gray95")
-    points(dat$longitude[1:i], dat$latitude[1:i], pch = ".", 
-           cex = 2, col = "blue")
+  for (i in 1:1000) {
+    plot(newmap, xlim = c(-140, -20), ylim = c(0, 80), asp = 1,
+         col = "gray95", bg = "#dde9f2", border = "#b5c5d0")
+    points(dat$longitude[1:north[i]], dat$latitude[1:north[i]], 
+           col = "#6591ce90", pch = 20, 
+           cex = dat$wind_speed[1:north[i]]/40)
   }}, 
-  img.name = "storms_plot", ani.height = 500, ani.width = 550,
+  img.name = "storms_plot", ani.height = 500, ani.width = 600,
   title = "Storm Tracks"
 )
-
 
