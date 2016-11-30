@@ -60,3 +60,18 @@ saveHTML({
   title = "Storm Tracks"
 )
 
+
+# save as GIF animation
+saveGIF({
+  ani.options(interval = 0.1, nmax = 200)  # create 100 image frames
+  for (i in 1:500) {
+    plot(newmap, xlim = c(-140, -20), ylim = c(0, 80), asp = 1,
+         col = "gray95", bg = "#dde9f2", border = "#b5c5d0")
+    points(dat$longitude[1:north[i]], dat$latitude[1:north[i]], 
+           col = "#6591ce90", pch = 20, 
+           cex = dat$wind_speed[1:north[i]]/40)
+  }},
+  movie.name = "hurricanes.gif",
+  img.name = "hurricanes_plot", ani.height = 500, ani.width = 600,
+  title = "Storm Tracks"
+)
